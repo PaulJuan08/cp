@@ -1,4 +1,5 @@
 <x-app-layout>
+
     @extends('layouts.admindashboard')
 
     <!-- Content -->
@@ -26,6 +27,7 @@
                                     ✕
                                 </button>
                             </div>
+                            <div class="max-h-[80vh] overflow-y-auto">
                             <form action="{{ route('admin.topics.store') }}" method="POST" >
                                 @csrf
                                 <div class="mb-3">
@@ -40,8 +42,12 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
-                                    <textarea id="content" name="content" rows="5" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                    <div class="mb-3">
+                                    <textarea id="content" name="content" rows="3" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                    </textarea>
+                                </div>
+
                                 </div>
                                 <div class="mb-3">
                                     <label for="audio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Audio File (MP3, WAV, M4A)</label>
@@ -57,6 +63,7 @@
                                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Topic</button>
                                 </div>
                             </form>
+                            </div>
                         </div>
                     </div>
 
@@ -151,34 +158,12 @@
         </div>
     </div>
 
+    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <script>
-    // Show topic details in the view modal
-    function showTopic(id) {
-        fetch(`/topics/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('modalTitle').innerText = data.topic_name;
-                document.getElementById('modalDescription').innerText = data.topic_desc;
-                document.getElementById('modalContent').innerText = data.content;
-                if (data.audio_path) {
-                    document.getElementById('modalAudio').src = `/storage/${data.audio_path}`;
-                    document.getElementById('modalAudio').style.display = 'block';
-                } else {
-                    document.getElementById('modalAudio').style.display = 'none';
-                }
-                if (data.video_url) {
-                    document.getElementById('modalVideo').src = data.video_url;
-                    document.getElementById('modalVideo').style.display = 'block';
-                } else {
-                    document.getElementById('modalVideo').style.display = 'none';
-                }
-            });
-    }
+        document.addEventListener("DOMContentLoaded", function () {
+            CKEDITOR.replace('content');
+        });
+    </script>
 
-    // Initialize HS Overlay for modals
-    document.addEventListener('DOMContentLoaded', function () {
-        const addTopicModal = new HSOverlay('#addTopicModal');
-        const viewTopicModal = new HSOverlay('#viewTopicModal');
-    });
-</script>
+
 </x-app-layout>

@@ -9,13 +9,13 @@
                 @isset($topic)
                     <!-- Display details of a single topic -->
                     <div id="topics" class="min-h-[25rem] scroll-mt-24">
-                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Topic Details</h2>
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Topic Content</h2>
 
                         <div class="bg-white border shadow-sm rounded-xl p-4 dark:bg-gray-900 dark:border-gray-800">
                             <h3 class="font-semibold text-gray-800 dark:text-white">{{ $topic->topic_name }}</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ $topic->topic_desc }}</p>
                             <div class="mt-4">
-                                <p class="text-gray-700 dark:text-gray-300">{{ $topic->content }}</p>
+                                <p class="text-gray-700 dark:text-gray-300">{!! $topic->content !!}</p>
                             </div>
 
                             <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">

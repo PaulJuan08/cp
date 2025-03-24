@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class TopicsController extends Controller
 {
-    // Assign topics to courses
     public function assignTopicsToCourses(Request $request)
     {
         $request->validate([
@@ -18,106 +17,88 @@ class TopicsController extends Controller
         ]);
 
         $topic = Topic::findOrFail($request->topic_id);
-        $topic->courses()->sync($request->course_ids);
+        $topic->courses()->syncWithoutDetaching($request->course_ids);
 
         return response()->json(['message' => 'Topic assigned to courses successfully']);
     }
 
-    // Display all topics
     public function index()
     {
         $topics = Topic::all();
         return view('admin.topics.index', compact('topics'));
     }
 
-    // Store a new topic
     public function store(Request $request)
     {
         $request->validate([
             'topic_name' => 'required|string|max:255',
             'topic_desc' => 'nullable|string',
             'content' => 'nullable|string',
-            'audio_path' => 'nullable|string',
-            'video_url' => 'nullable|string',
+            'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
+            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
         ]);
 
-        $topic = Topic::create([
-            'topic_name' => $request->input('topic_name'),
-            'topic_desc' => $request->input('topic_desc'),
-            'content' => $request->input('content'),
-            'audio_path' => $request->input('audio_path'),
-            'video_url' => $request->input('video_url'),
+        $audioPath = $request->hasFile('audio') 
+            ? $request->file('audio')->store('uploads/audios', 'public') 
+            : null;
+
+        Topic::create([
+            'topic_name' => $request->topic_name,
+            'topic_desc' => $request->topic_desc,
+            'content' => $request->content,
+            'audio_path' => $audioPath,
+            'video_url' => $request->video_url,
         ]);
 
-        if ($topic) {
-            return redirect()->route('admin.topics.index')->with('success', 'Topic added successfully.');
-        } else {
-            return back()->with('error', 'Failed to add topic.');
-        }
+        return redirect()->route('admin.topics.index')->with('success', 'Topic added successfully.');
     }
 
-    public function show($id)
+    public function show(Topic $topic)
     {
-        $topic = Topic::findOrFail($id);
         return view('admin.content', compact('topic'));
     }
 
-    // Edit a topic
-    public function edit($id)
+    public function edit(Topic $topic)
     {
-        $topic = Topic::findOrFail($id);
         return view('admin.edit_topic', compact('topic'));
     }
 
-    // Update a topic
-    public function update(Request $request, $id)
+    public function update(Request $request, Topic $topic)
     {
         $request->validate([
             'topic_name' => 'required|string|max:255',
             'topic_desc' => 'required|string',
             'content' => 'required|string',
-            'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120', // Changed from 'voice' to 'audio'
-            'video_url' => [
-                'nullable',
-                'url',
-                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[A-Za-z0-9_-]+$/'
-            ],
+            'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
+            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
         ]);
 
-        $topic = Topic::findOrFail($id);
-
-        // Handle audio file upload
         if ($request->hasFile('audio')) {
-            if ($topic->audio_path) { // Changed from 'voice_path' to 'audio_path'
-                Storage::disk('public')->delete($topic->audio_path); // Changed from 'voice_path' to 'audio_path'
+            if ($topic->audio_path) {
+                Storage::disk('public')->delete($topic->audio_path);
             }
-            $topic->audio_path = $request->file('audio')->store('uploads/audios', 'public'); // Changed path to 'uploads/audios'
+            $topic->audio_path = $request->file('audio')->store('uploads/audios', 'public');
         }
 
-        // Update the topic
         $topic->update([
             'topic_name' => $request->topic_name,
             'topic_desc' => $request->topic_desc,
             'content' => $request->content,
-            'audio_path' => $topic->audio_path, // Changed from 'voice_path' to 'audio_path'
+            'audio_path' => $topic->audio_path,
             'video_url' => $request->video_url,
         ]);
 
-        return redirect()->route('admin.topics')->with('success', 'Topic updated successfully!');
+        return redirect()->route('admin.topics.index')->with('success', 'Topic updated successfully!');
     }
 
-    // Delete a topic
-    public function destroy($id)
+    public function destroy(Topic $topic)
     {
-        $topic = Topic::findOrFail($id);
-
-        // Delete associated files
-        if ($topic->audio_path) { // Changed from 'voice_path' to 'audio_path'
-            Storage::disk('public')->delete($topic->audio_path); // Changed from 'voice_path' to 'audio_path'
+        if ($topic->audio_path) {
+            Storage::disk('public')->delete($topic->audio_path);
         }
 
         $topic->delete();
 
-        return redirect()->route('admin.topics')->with('success', 'Topic deleted successfully!');
+        return redirect()->route('admin.topics.index')->with('success', 'Topic deleted successfully!');
     }
 }
