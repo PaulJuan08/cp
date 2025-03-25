@@ -67,33 +67,7 @@
                         </div>
                     </div>
 
-                    <!-- View Topic Modal -->
-                    <div id="viewTopicModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
-                            <div class="flex justify-between items-center mb-4">
-                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white" id="modalTitle"></h5>
-                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
-                                    data-hs-overlay="#viewTopicModal">
-                                    ✕
-                                </button>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" id="modalDescription"></p>
-                                <div class="mt-4">
-                                    <p class="text-gray-700 dark:text-gray-300" id="modalContent"></p>
-                                </div>
-                                <div class="mt-4">
-                                    <audio controls id="modalAudio">
-                                        <source src="" type="audio/mpeg">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                </div>
-                                <div class="mt-4">
-                                    <iframe width="100%" height="315" id="modalVideo" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <!-- Display Topics -->
                     @if ($topics->isEmpty())
@@ -124,8 +98,24 @@
 
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
+                                                    
+                                                    <!-- Create Quiz Button -->
+                                                    <a href="{{ route('admin.topics.quiz') }}" class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
+                                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M12 5v14M5 12h14"/>
+                                                        </svg>
+                                                        Create Quiz
+                                                    </a>
+
+
                                                     <!-- Edit Action -->
-                                                    <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700" href="{{ route('admin.topics.edit', $topic->id) }}">
+                                                    <a href="#" class="edit-btn flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+                                                        data-id="{{ $topic->id }}" 
+                                                        data-name="{{ $topic->topic_name }}" 
+                                                        data-desc="{{ $topic->topic_desc }}" 
+                                                        data-content="{{ $topic->content }}" 
+                                                        data-video="{{ $topic->video_url }}"
+                                                        data-hs-overlay="#editTopicModal">
                                                         <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
                                                         </svg>
@@ -153,6 +143,50 @@
                             @endforeach
                         </div>
                     @endif
+
+                    <!-- Edit Topic Modal -->
+                    <div id="editTopicModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Topic</h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    data-hs-overlay="#editTopicModal">
+                                    ✕
+                                </button>
+                            </div>
+                            <div class="max-h-[80vh] overflow-y-auto">
+                            <form id="editTopicForm" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" id="edit_topic_id" name="topic_id">
+
+                                <div class="mb-3">
+                                    <label for="edit_topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
+                                    <input type="text" id="edit_topic_name" name="topic_name" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
+                                    <textarea id="edit_topic_desc" name="topic_desc" rows="3" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                    <textarea id="edit_content" name="content" rows="3" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
+                                    <input type="url" id="edit_video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Topic</button>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -160,10 +194,30 @@
 
     <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             CKEDITOR.replace('content');
         });
     </script>
+
+    <!-- JavaScript to Handle Edit Modal -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            CKEDITOR.replace('edit_content'); // Initialize CKEditor for the edit modal
+
+            document.querySelectorAll(".edit-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    document.getElementById("edit_topic_id").value = this.dataset.id;
+                    document.getElementById("edit_topic_name").value = this.dataset.name;
+                    document.getElementById("edit_topic_desc").value = this.dataset.desc;
+                    CKEDITOR.instances['edit_content'].setData(this.dataset.content);
+                    document.getElementById("edit_video_url").value = this.dataset.video;
+
+                    document.getElementById("editTopicForm").setAttribute("action", `/admin/topics/${this.dataset.id}`);
+                });
+            });
+        });
+    </script>
+
 
 
 </x-app-layout>

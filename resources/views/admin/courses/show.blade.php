@@ -65,11 +65,11 @@
                         <tr class="border-b">
                             <th class="px-4 py-2 text-left">ID</th>
                             <th class="px-4 py-2 text-left">Topic Name</th>
-                            <th class="px-4 py-2 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($course->topics as $topic)
+                        @if($topic->status == 1)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-2">{{ $topic->id }}</td>
                             <td class="px-4 py-2">
@@ -77,15 +77,8 @@
                                     {{ $topic->topic_name }}
                                 </a>
                             </td>
-                            <td class="px-4 py-2 text-center space-x-2">
-                                <a href="{{ route('admin.topics.edit', $topic->id) }}" class="text-blue-600 hover:underline">Edit</a>
-                                <form action="{{ route('admin.topics.destroy', $topic->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                                </form>
-                            </td>
                         </tr>
+                        @endif
                         @endforeach
                     </tbody>
                 </table>

@@ -24,34 +24,39 @@ class TopicsController extends Controller
 
     public function index()
     {
-        $topics = Topic::all();
+        $topics = Topic::where('status', 1)->get();
         return view('admin.topics.index', compact('topics'));
+
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'topic_name' => 'required|string|max:255',
             'topic_desc' => 'nullable|string',
             'content' => 'nullable|string',
             'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
-            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
+            'video_url' => 'nullable|url|regex:/^(https:\/\/www\.youtube\.com\/|https:\/\/youtu\.be\/)/',
         ]);
 
+        // Handle audio file upload
         $audioPath = $request->hasFile('audio') 
             ? $request->file('audio')->store('uploads/audios', 'public') 
             : null;
 
+        // Store the topic with default status = 1
         Topic::create([
-            'topic_name' => $request->topic_name,
-            'topic_desc' => $request->topic_desc,
-            'content' => $request->content,
+            'topic_name' => $validatedData['topic_name'],
+            'topic_desc' => $validatedData['topic_desc'] ?? null,
+            'content' => $validatedData['content'] ?? null,
             'audio_path' => $audioPath,
-            'video_url' => $request->video_url,
+            'video_url' => $validatedData['video_url'] ?? null,
+            'status' => 1, 
         ]);
 
         return redirect()->route('admin.topics.index')->with('success', 'Topic added successfully.');
     }
+
 
     public function show(Topic $topic)
     {
@@ -101,4 +106,14 @@ class TopicsController extends Controller
 
         return redirect()->route('admin.topics.index')->with('success', 'Topic deleted successfully!');
     }
+
+    public function hide($id)
+    {
+        $topic = Topic::findOrFail($id);
+        $topic->status = 0; // Mark as hidden
+        $topic->save();
+
+        return redirect()->back()->with('success', 'Topic removed from the list.');
+    }
+
 }

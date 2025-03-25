@@ -7,6 +7,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\TopicsController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ContentsController; 
+use App\Http\Controllers\QuizController;
 
 // Public Routes
 Route::get('/', function () {
@@ -40,11 +41,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Contents Management 
     Route::get('/contents', [ContentsController::class, 'index'])->name('contents.index'); // Show all topics
-    Route::get('topics/contents/{id}', [ContentsController::class, 'show'])->name('contents.show'); // Show a single topic
+    Route::get('/topics/contents/{id}', [ContentsController::class, 'show'])->name('contents.show'); // Show a single topic
 
     // Topics Management (CRUD)
     Route::resource('topics', TopicsController::class);
+
+    // Quiz Management (CRUD)
+    Route::get('/topics/{topic}/quiz', [QuizController::class, 'showQuiz'])->name('topics.quiz');
+    Route::get('/topics/{topic}/quiz/create', [QuizController::class, 'create'])->name('topics.quiz.create');
+    Route::post('/topics/{topic}/quiz/store', [QuizController::class, 'store'])->name('topics.quiz.store');
 });
+
 
 // Authentication Routes
 require __DIR__.'/auth.php';

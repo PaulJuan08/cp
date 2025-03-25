@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Topic;
@@ -53,6 +54,30 @@ class CoursesController extends Controller
         $course->topics()->attach($request->topic_id);
 
         return redirect()->route('admin.courses.show', $course->id)->with('success', 'Topic added successfully.');
+    }
+
+    public function edit($id)
+    {
+        $course = Course::findOrFail($id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $course = Course::findOrFail($id);
+        $course->course_name = $request->course_name;
+        $course->course_desc = $request->course_desc;
+        $course->save();
+
+        return redirect()->back()->with('success', 'Course updated successfully');
+    }
+
+
+    public function destroy($id)
+    {
+        $course = Course::findOrFail($id);
+        $course->delete();
+
+        return redirect()->back()->with('success', 'Course deleted successfully');
     }
 
 
