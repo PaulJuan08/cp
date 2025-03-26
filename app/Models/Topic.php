@@ -38,4 +38,9 @@ class Topic extends Model
         return $this->belongsToMany(Course::class, 'course_topics', 'topic_id', 'course_id')->withTimestamps();
     }
 
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
 }
