@@ -7,12 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class QuizAnswer extends Model
 {
     protected $fillable = [
-        'quiz_item_id', 'correct_answer',
-        'keywords', 'max_words'
+        'quiz_id', 
+        'question_id', 
+        'answer_text', 
+        'is_correct'
     ];
 
-    public function item(): BelongsTo
+    public function question()
     {
-        return $this->belongsTo(QuizItem::class);
+        return $this->belongsTo(QuizQuestion::class);
+    }
+
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class);
     }
 }

@@ -20,6 +20,8 @@ class Topic extends Model
         'content',
         'audio_path', // Changed from 'voice_path' to 'audio_path'
         'video_url',
+        'name', 
+        'description'
     ];
 
     /**
@@ -37,6 +39,7 @@ class Topic extends Model
     {
         return $this->belongsToMany(Course::class, 'course_topics', 'topic_id', 'course_id')->withTimestamps();
     }
+
 
     public function quizzes()
     {

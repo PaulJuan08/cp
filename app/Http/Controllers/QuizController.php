@@ -2,82 +2,81 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Quiz;
 use App\Models\Topic;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
-
+    // List all quizzes for a given topic
     public function index(Topic $topic)
     {
-        $quizzes = $topic->quizzes()->with('options')->paginate(10);
-        return view('admin.quizzes.index', compact('topic', 'quizzes'));
+        $quizzes = Quiz::where('topic_id', $topic->id)->get();
+        return view('admin.topics.quiz.index', compact('topic', 'quizzes'));
     }
 
-    public function show(Topic $topic)
+    // Show a specific quiz
+    public function show(Topic $topic, Quiz $quiz)
     {
-        $quiz = $topic->quiz()->with(['items.options', 'items.answer'])->firstOrFail();
-        return view('admin.quizzes.show', compact('topic', 'quiz'));
+        $quiz->load('questions'); // Eager load questions to avoid extra queries
+
+        return view('admin.topics.quiz.show', compact('topic', 'quiz'));
     }
 
-    public function edit(Topic $topic)
-    {
-        $quiz = $topic->quiz()->firstOrNew();
-        return view('admin.quizzes.edit', compact('topic', 'quiz'));
-    }
 
-    public function update(Request $request, Topic $topic)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'time_limit' => 'nullable|integer|min:1',
-            'is_published' => 'boolean'
-        ]);
 
-        $quiz = $topic->quiz()->updateOrCreate([], $validated);
 
-        return redirect()->route('admin.topics.quiz.show', $topic)
-            ->with('success', 'Quiz settings updated successfully');
-    }
-
+    // Show the form to create a new quiz
     public function create(Topic $topic)
     {
-        // Check if quiz already exists
-        if ($topic->quiz) {
-            return redirect()->route('admin.topics.quiz.show', $topic)
-                ->with('warning', 'This topic already has a quiz');
-        }
-
-        return view('admin.quizzes.create', compact('topic'));
+        return view('admin.topics.quiz.create', compact('topic'));
     }
 
+    // Store a new quiz
     public function store(Request $request, Topic $topic)
     {
-        $validated = $request->validate([
-            'question' => 'required|string',
-            'options' => 'required|array|size:4',
-            'options.*.text' => 'required|string',
-            'correct_answer' => 'required|in:A,B,C,D'
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        // Create quiz for this topic
-        $quiz = $topic->quizzes()->create([
-            'question' => $validated['question'],
-            'correct_answer' => $validated['correct_answer']
+        // Create the quiz
+        $quiz = Quiz::create([
+            'topic_id' => $topic->id,
+            'title' => $request->title,
+            'description' => $request->description,
         ]);
 
-        // Create options
-        foreach ($validated['options'] as $label => $option) {
-            $quiz->options()->create([
-                'option_label' => $label,
-                'option_text' => $option['text']
-            ]);
-        }
+        return redirect()->route('admin.topics.quiz.index', $topic)
+                         ->with('success', 'Quiz created successfully!');
+    }
 
-        return redirect()->route('admin.topics.quizzes.index', $topic)
-            ->with('success', 'Quiz created successfully!');
+    // Show the edit form
+    public function edit(Topic $topic, Quiz $quiz)
+    {
+        return view('admin.topics.quiz.edit', compact('topic', 'quiz'));
+    }
+
+    // Update the quiz
+    public function update(Request $request, Topic $topic, Quiz $quiz)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $quiz->update($request->all());
+
+        return redirect()->route('admin.topics.quiz.index', $topic)
+                         ->with('success', 'Quiz updated successfully!');
+    }
+
+    // Delete a quiz
+    public function destroy(Topic $topic, Quiz $quiz)
+    {
+        $quiz->delete();
+
+        return redirect()->route('admin.topics.quiz.index', $topic)
+                         ->with('success', 'Quiz deleted successfully!');
     }
 }

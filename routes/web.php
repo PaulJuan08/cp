@@ -59,50 +59,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('topics', TopicsController::class);
 
  
-    // Quiz Routes
-    Route::prefix('topics/{topic}')->group(function () {
-
-        // Quiz Creation
-        Route::get('/quiz/create', [QuizController::class, 'create'])
-        ->name('topics.quiz.create');
-        Route::post('/quiz/store', [QuizController::class, 'store'])
-        ->name('topics.quiz.store');
-
-        // Quiz Management
-        Route::get('/quiz/{quiz}', [QuizController::class, 'show'])
-        ->name('topics.quiz.show');
-        Route::get('/quiz/{quiz}/edit', [QuizController::class, 'edit'])
-        ->name('topics.quiz.edit');
-        Route::put('/quiz/{quiz}', [QuizController::class, 'update'])
-        ->name('topics.quiz.update');
-
-        // Quiz Items Management
-        Route::prefix('/quiz/{quiz}/items')->group(function () {
-            Route::get('/create', [QuizItemController::class, 'create'])
-            ->name('topics.quiz.items.create');
-            Route::post('/', [QuizItemController::class, 'store'])
-            ->name('topics.quiz.items.store');
-            Route::get('/{item}/edit', [QuizItemController::class, 'edit'])
-            ->name('topics.quiz.items.edit');
-            Route::put('/{item}', [QuizItemController::class, 'update'])
-            ->name('topics.quiz.items.update');
-            Route::delete('/{item}', [QuizItemController::class, 'destroy'])
-            ->name('topics.quiz.items.destroy');
-
-            // Quiz Options Management
-            Route::prefix('/{item}/options')->group(function () {
-                Route::post('/', [QuizOptionController::class, 'store'])
-                ->name('topics.quiz.items.options.store');
-                Route::put('/{option}', [QuizOptionController::class, 'update'])
-                ->name('topics.quiz.items.options.update');
-                Route::delete('/{option}', [QuizOptionController::class, 'destroy'])
-                ->name('topics.quiz.items.options.destroy');
-            });
-        });
+    // Quiz Management (Nested under Topics)
+    Route::prefix('topics/{topic}/quiz')->name('topics.quiz.')->group(function () {
+        Route::get('/', [QuizController::class, 'index'])->name('index'); // Matches topics.quiz.index
+        Route::get('/create', [QuizController::class, 'create'])->name('create');
+        Route::post('/', [QuizController::class, 'store'])->name('store');
+        Route::get('/{quiz}', [QuizController::class, 'show'])->name('show');
+        Route::get('/{quiz}/edit', [QuizController::class, 'edit'])->name('edit');
+        Route::put('/{quiz}', [QuizController::class, 'update'])->name('update');
+        Route::delete('/{quiz}', [QuizController::class, 'destroy'])->name('destroy');
     });
-
 });
-
 
 
 // Authentication Routes
