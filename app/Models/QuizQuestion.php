@@ -2,22 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-
+use Illuminate\Database\Eloquent\Model;
 
 class QuizQuestion extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['quiz_id', 'question', 'correct_answer'];
+    protected $table = 'quiz_questions';
 
-    public function quiz()
+    protected $fillable = ['quiz_id', 'question_text'];
+
+    /**
+     * Get the correct answer for the question.
+     */
+    public function correctAnswer()
     {
-        return $this->belongsTo(Quiz::class);
+        return $this->hasOne(QuizAnswer::class, 'question_id');
     }
 
+    /**
+     * Get all possible answers (assuming multiple choices).
+     */
     public function answers()
     {
         return $this->hasMany(QuizAnswer::class, 'question_id');

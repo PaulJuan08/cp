@@ -9,8 +9,8 @@ use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ContentsController; 
 use App\Http\Controllers\{
     QuizController,
-    QuizItemController,
-    QuizOptionController
+    QuizQuestionController,
+    QuizAnswerController
 };
 
 // Public Routes
@@ -68,6 +68,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/{quiz}/edit', [QuizController::class, 'edit'])->name('edit');
         Route::put('/{quiz}', [QuizController::class, 'update'])->name('update');
         Route::delete('/{quiz}', [QuizController::class, 'destroy'])->name('destroy');
+        Route::post('/{quiz}/questions', [QuizQuestionController::class, 'store'])->name('questions.store');
+
     });
 });
 

@@ -1,11 +1,16 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QuizAnswer extends Model
 {
+    use HasFactory;
+
+    protected $table = 'quiz_answers';
+
     protected $fillable = [
         'quiz_id', 
         'question_id', 
@@ -13,13 +18,11 @@ class QuizAnswer extends Model
         'is_correct'
     ];
 
+    /**
+     * Defines a relationship with QuizQuestion.
+     */
     public function question()
     {
-        return $this->belongsTo(QuizQuestion::class);
-    }
-
-    public function quiz()
-    {
-        return $this->belongsTo(Quiz::class);
+        return $this->belongsTo(QuizQuestion::class, 'question_id');
     }
 }

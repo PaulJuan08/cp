@@ -18,12 +18,12 @@ class QuizController extends Controller
     // Show a specific quiz
     public function show(Topic $topic, Quiz $quiz)
     {
-        $quiz->load('questions'); // Eager load questions to avoid extra queries
-
+        // Load questions along with all their answers
+        $quiz->load(['questions.answers']);
+    
         return view('admin.topics.quiz.show', compact('topic', 'quiz'));
     }
-
-
+    
 
 
     // Show the form to create a new quiz
