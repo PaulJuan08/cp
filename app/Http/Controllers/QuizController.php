@@ -79,4 +79,13 @@ class QuizController extends Controller
         return redirect()->route('admin.topics.quiz.index', $topic)
                          ->with('success', 'Quiz deleted successfully!');
     }
+
+    public function viewAsUser($topicId, $quizId)
+    {
+        $topic = Topic::findOrFail($topicId);
+        $quiz = Quiz::findOrFail($quizId);
+
+        return view('admin.topics.quiz.user_quiz', compact('topic', 'quiz'));
+    }
+
 }

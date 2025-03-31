@@ -69,6 +69,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/{quiz}', [QuizController::class, 'update'])->name('update');
         Route::delete('/{quiz}', [QuizController::class, 'destroy'])->name('destroy');
         Route::post('/{quiz}/questions', [QuizQuestionController::class, 'store'])->name('questions.store');
+        Route::delete('/{quiz}/questions/{question}', 
+        [QuizQuestionController::class, 'destroy'])->name('questions.destroy');
+
+
+
+        // View as User Route (Corrected)
+        Route::get('/{quiz}/user', [QuizController::class, 'viewAsUser'])
+        ->name('user_quiz');
+
+        Route::post('/{quiz}/user', [QuizController::class, 'submitQuiz'])
+        ->name('submit');
+
+
 
     });
 });

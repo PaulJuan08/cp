@@ -36,7 +36,7 @@ class TopicsController extends Controller
             'topic_desc' => 'nullable|string',
             'content' => 'nullable|string',
             'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
-            'video_url' => 'nullable|url|regex:/^(https:\/\/www\.youtube\.com\/|https:\/\/youtu\.be\/)/',
+            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
         ]);
 
         // Handle audio file upload
@@ -74,24 +74,25 @@ class TopicsController extends Controller
             'topic_name' => 'required|string|max:255',
             'topic_desc' => 'required|string',
             'content' => 'required|string',
-            'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
-            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
         ]);
 
         if ($request->hasFile('audio')) {
             if ($topic->audio_path) {
                 Storage::disk('public')->delete($topic->audio_path);
             }
-            $topic->audio_path = $request->file('audio')->store('uploads/audios', 'public');
+            $audioPath = $request->file('audio')->store('uploads/audios', 'public');
+        } else {
+            $audioPath = $topic->audio_path; // Keep the existing path
         }
-
+        
         $topic->update([
             'topic_name' => $request->topic_name,
             'topic_desc' => $request->topic_desc,
             'content' => $request->content,
-            'audio_path' => $topic->audio_path,
+            'audio_path' => $audioPath,
             'video_url' => $request->video_url,
         ]);
+        
 
         return redirect()->route('admin.topics.index')->with('success', 'Topic updated successfully!');
     }

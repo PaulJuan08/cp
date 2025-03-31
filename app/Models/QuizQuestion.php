@@ -13,6 +13,11 @@ class QuizQuestion extends Model
 
     protected $fillable = ['quiz_id', 'question_text'];
 
+    protected $casts = [
+        'is_correct' => 'boolean',
+    ];
+    
+
     /**
      * Get the correct answer for the question.
      */
@@ -28,4 +33,9 @@ class QuizQuestion extends Model
     {
         return $this->hasMany(QuizAnswer::class, 'question_id');
     }
+
+    // public function options()
+    // {
+    //     return $this->hasMany(QuizOption::class, 'question_id');
+    // }
 }

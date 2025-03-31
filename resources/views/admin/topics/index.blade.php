@@ -2,6 +2,8 @@
 
     @extends('layouts.admindashboard')
 
+ 
+
     <!-- Content -->
     <div class="lg:ps-[260px]">
         <div class="min-h-[75rem] p-4 md:p-8">
@@ -43,21 +45,10 @@
                                 <div class="mb-3">
                                     <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
                                     <div class="mb-3">
-                                    <textarea id="content" name="content" rows="3" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                    </textarea>
+                                        <div id="tiptap-editor" class="border p-2 rounded-md dark:bg-gray-700 dark:text-white"></div>
+                                        <input type="hidden" id="content" name="content"> 
                                 </div>
 
-                                </div>
-                                <div class="mb-3">
-                                    <label for="audio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Audio File (MP3, WAV, M4A)</label>
-                                    <input type="file" id="audio" name="audio" accept=".mp3, .wav, .m4a"
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
-                                    <input type="url" id="video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
                                 </div>
                                 <div class="flex justify-end">
                                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Topic</button>
@@ -193,32 +184,69 @@
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            CKEDITOR.replace('content');
+    <script type="module">
+    import { Editor } from 'https://esm.sh/@tiptap/core@2.11.0';
+    import StarterKit from 'https://esm.sh/@tiptap/starter-kit@2.11.0';
+    import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+    import OrderedList from 'https://esm.sh/@tiptap/extension-ordered-list';
+
+    // Initialize TipTap
+    const editor = new Editor({
+        element: document.querySelector('#tiptap-editor'),
+        extensions: [
+            StarterKit,
+            Placeholder.configure({
+                placeholder: 'Enter topic content...',
+                emptyNodeClass: 'text-gray-500 dark:text-neutral-400'
+            }),
+            OrderedList.configure({
+                HTMLAttributes: {
+                    class: 'list-decimal list-inside text-gray-800 dark:text-white'
+                }
+            })
+        ],
+        content: '', // Initial content (if editing, fetch from DB)
+        onUpdate: ({ editor }) => {
+            document.querySelector('#content').value = editor.getHTML(); // Store HTML content in hidden input
+        }
+    });
+
+    // Optional: Button to toggle ordered list formatting
+    document.querySelector('#toggle-ordered-list')?.addEventListener('click', () => {
+        editor.chain().focus().toggleOrderedList().run();
+    });
+</script>
+
+<!-- Fix ProseMirror Issues -->
+<script type="importmap">
+  {
+    "imports": {
+      "https://esm.sh/v135/prosemirror-model@1.19.3/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs",
+      "https://esm.sh/v135/prosemirror-model@1.21.0/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs",
+      "https://esm.sh/v135/prosemirror-model@1.22.1/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs"
+    }
+  }
+</script>
+
+<script type="module">
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const desc = this.dataset.desc;
+            const content = this.dataset.content || ''; // Ensure content exists
+
+            document.querySelector('#edit_topic_id').value = id;
+            document.querySelector('#edit_topic_name').value = name;
+            document.querySelector('#edit_topic_desc').value = desc;
+            editor.commands.setContent(content); // Load content into TipTap
         });
-    </script>
+    });
 
-    <!-- JavaScript to Handle Edit Modal -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            CKEDITOR.replace('edit_content'); // Initialize CKEditor for the edit modal
-
-            document.querySelectorAll(".edit-btn").forEach(button => {
-                button.addEventListener("click", function() {
-                    document.getElementById("edit_topic_id").value = this.dataset.id;
-                    document.getElementById("edit_topic_name").value = this.dataset.name;
-                    document.getElementById("edit_topic_desc").value = this.dataset.desc;
-                    CKEDITOR.instances['edit_content'].setData(this.dataset.content);
-                    document.getElementById("edit_video_url").value = this.dataset.video;
-
-                    document.getElementById("editTopicForm").setAttribute("action", `/admin/topics/${this.dataset.id}`);
-                });
-            });
-        });
-    </script>
-
+    document.querySelector('#editTopicForm').addEventListener('submit', function () {
+        document.querySelector('#edit_content').value = editor.getHTML();
+    });
+</script>
 
 
 </x-app-layout>
