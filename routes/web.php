@@ -6,11 +6,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\TopicsController;
 use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\UsersCoursesController;
 use App\Http\Controllers\ContentsController; 
+use App\Http\Controllers\UsersContentsController; 
 use App\Http\Controllers\{
     QuizController,
     QuizQuestionController,
-    QuizAnswerController
 };
 
 // Public Routes
@@ -48,6 +49,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('courses', CoursesController::class);
     Route::post('/courses/{course}/add-topic', [CoursesController::class, 'addTopic'])
     ->name('courses.addTopic');
+    // Route::put('/courses/{course}/assign-role', [CoursesController::class, 'assignRole'])
+    //     ->name('courses.assignRole');
+    Route::put('/courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
+    ->name('admin.courses.assign-roles');
+
 
     // Contents Management 
     Route::get('/contents', [ContentsController::class, 'index'])
@@ -57,6 +63,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Topics Management (CRUD)
     Route::resource('topics', TopicsController::class);
+    Route::put('/admin/topics', [TopicsController::class, 'update'])->name('admin.topics.update');
+
+    
 
  
     // Quiz Management (Nested under Topics)
@@ -84,6 +93,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 
     });
+});
+
+// For regular users
+Route::middleware('auth')->group(function () {
+    Route::get('/users/dashboard', [UsersController::class, 'dashboard'])->name('users.dashboard');
+    Route::get('/users/dashboard', [UsersController::class, 'userindex'])->name('users.dashboard');
+
+    // Courses Management
+    Route::get('/users/courses', [UsersCoursesController::class, 'index'])->name('users.courses.index');
+    Route::get('/users/courses/{id}', [UsersCoursesController::class, 'show'])->name('users.courses.show');
+    Route::get('/users/contents/{id}', [UsersContentsController::class, 'show'])->name('users.contents.show');
+
 });
 
 

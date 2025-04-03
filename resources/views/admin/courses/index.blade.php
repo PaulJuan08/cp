@@ -71,6 +71,13 @@
 
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
+
+                                                     <!-- Assign Role Action -->
+                                                    <button type="button" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                        onclick="openAssignModal('{{ $course->id }}', '{{ $course->role_name }}')">
+                                                        🎓 Assign Role
+                                                    </button>
+
                                                     <!-- Edit Action -->
                                                     <button type="button" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700" 
                                                         onclick="openEditModal('{{ $course->id }}', '{{ $course->course_name }}', '{{ $course->course_desc }}')">
@@ -93,7 +100,54 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                  
+                                    </div>   
+                                    
+                                    <!-- Assign Role Modal -->
+                                    <div id="assignRoleModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                                            <div class="flex justify-between items-center mb-4">
+                                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white">Assign Role to Course</h5>
+                                                <button type="button" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                    onclick="openAssignModal('{{ $course->id }}')">
+                                                    🎓 Assign Role
+                                                </button>
+
+                                            </div>
+
+                                            <form id="assignRoleForm" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="mb-4">
+                                                    <label class="block text-sm font-medium mb-2 dark:text-white">
+                                                        Select Roles
+                                                    </label>
+                                                    <div class="space-y-2">
+                                                    @foreach(['Faculty', 'Staff', 'Student', 'Others'] as $role)
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" name="roles[]" value="{{ $role }}" 
+                                                                {{ $course->assignedRoles->contains('role_name', $role) ? 'checked' : '' }}
+                                                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                                            <span class="ml-2">{{ $role }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-end gap-2">
+                                                    <button type="button" onclick="closeAssignModal()"
+                                                        class="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                                        Save Roles
+                                                    </button>
+                                                </div>
+                                            </form>
+
+
+
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -142,12 +196,32 @@
     </div>
 
     <script>
+        // Edit Course Modal (unchanged)
         function openEditModal(id, name, desc) {
             document.getElementById('edit_course_name').value = name;
             document.getElementById('edit_course_desc').value = desc;
             document.getElementById('editCourseForm').action = `/admin/courses/${id}`;
             document.getElementById('editcourseModal').classList.remove('hidden');
         }
-    </script>
+
+        // Assign Role Modal functions
+        function openAssignModal(courseId, currentRoles = []) {
+            const form = document.getElementById('assignRoleForm');
+            form.action = `/admin/courses/${courseId}/assign-roles`;
+            
+            // Clear previous selections
+            const checkboxes = document.querySelectorAll('#assignRoleModal input[name="roles[]"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = currentRoles.includes(checkbox.value);
+            });
+            
+            document.getElementById('assignRoleModal').classList.remove('hidden');
+        }
+
+        function closeAssignModal() {
+            document.getElementById('assignRoleModal').classList.add('hidden');
+        }
+    </script>                            
+                                
 
 </x-app-layout>

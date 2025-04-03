@@ -35,7 +35,7 @@
                             <div class="grid space-y-2 mt-3">
                                 @foreach($options as $option)
                                     <label class="max-w-xs flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm">
-                                        <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}"
+                                        <input type="radio" name="answers[{{ $question->id }}][]" value="{{ $option }}"
                                             class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none">
                                         
                                         <span class="text-sm ms-3 text-gray-500">
