@@ -1,5 +1,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/preline/dist/preline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/tiptap-core.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/starter-kit.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/placeholder.umd.min.js"></script>
 
 
 <!-- ========== MAIN CONTENT ========== -->

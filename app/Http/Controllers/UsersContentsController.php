@@ -15,8 +15,7 @@ class UsersContentsController extends Controller
 
     public function show($id)
     {
-        $topic = Topic::findOrFail($id); // Find the topic or throw 404
-
+        $topic = Topic::with('quizzes')->findOrFail($id);
         return view('users.contents.index', compact('topic'));
     }
 }

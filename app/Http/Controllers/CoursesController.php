@@ -68,24 +68,40 @@ class CoursesController extends Controller
 
     public function assignRoles(Request $request, Course $course)
     {
-        $validRoles = ['Faculty', 'Staff', 'Student', 'Others']; // Your allowed roles
-        
         $validated = $request->validate([
-            'roles' => 'required|array',
-            'roles.*' => ['required', 'string', Rule::in($validRoles)]
+            'roles' => 'sometimes|array',
+            'roles.*' => 'string|in:Faculty,Staff,Student,Others'
         ]);
 
-        DB::transaction(function () use ($course, $validated) {
-            // Clear existing roles
+        try {
+            DB::beginTransaction();
+            
+            // Remove existing roles
             $course->assignedRoles()->delete();
             
-            // Add new roles
-            foreach ($validated['roles'] as $role) {
-                $course->assignedRoles()->create(['role_name' => $role]);
+            // Add new roles if any were selected
+            if (!empty($validated['roles'])) {
+                $rolesToAdd = array_map(function($role) {
+                    return ['role_name' => $role];
+                }, $validated['roles']);
+                
+                $course->assignedRoles()->createMany($rolesToAdd);
             }
-        });
-
-        return redirect()->back()->with('success', 'Roles updated successfully');
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Roles assigned successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign roles: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 

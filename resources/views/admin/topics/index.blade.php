@@ -1,8 +1,5 @@
 <x-app-layout>
-
     @extends('layouts.admindashboard')
-
- 
 
     <!-- Content -->
     <div class="lg:ps-[260px]">
@@ -30,35 +27,39 @@
                                 </button>
                             </div>
                             <div class="max-h-[80vh] overflow-y-auto">
-                            <form action="{{ route('admin.topics.store') }}" method="POST" >
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
-                                    <input type="text" id="topic_name" name="topic_name" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
-                                    <textarea id="topic_desc" name="topic_desc" rows="3" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                <form action="{{ route('admin.topics.store') }}" method="POST">
+                                    @csrf
                                     <div class="mb-3">
-                                        <div id="tiptap-editor" class="border p-2 rounded-md dark:bg-gray-700 dark:text-white"></div>
-                                        <input type="hidden" id="content" name="content"> 
-                                </div>
-
-                                </div>
-                                <div class="flex justify-end">
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Topic</button>
-                                </div>
-                            </form>
+                                        <label for="topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
+                                        <input type="text" id="topic_name" name="topic_name" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
+                                        <textarea id="topic_desc" name="topic_desc" rows="3" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                        <!-- <div id="editor" style="min-height: 200px;" class="border p-2 rounded-md dark:bg-gray-700 dark:text-white"></div>
+                                        <input type="hidden" id="content" name="content"> -->
+                                        <textarea id="editor" name="content" rows="6"
+                                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">{{ old('content') }}
+                                        </textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                    <input type="url" name="video_url" 
+                                        placeholder="https://www.youtube.com/watch?v=..." 
+                                        value="{{ old('video_url', $topic->video_url ?? '') }}"
+                                        class="form-control">
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Topic</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-
-                    
 
                     <!-- Display Topics -->
                     @if ($topics->isEmpty())
@@ -68,16 +69,19 @@
                             @foreach ($topics as $topic)
                                 <!-- Topic Card -->
                                 <div class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-gray-900 dark:border-gray-800 p-4">
-                                <a href="{{ route('admin.contents.show', $topic->id) }}" 
-                                class="no-underline text-blue-500 hover:underline">
-                                    <h3 class="group-hover:text-blue-600 font-semibold text-gray-800 dark:text-gray-200">
-                                        {{ $topic->topic_name }}
-                                    </h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $topic->topic_desc }}
-                                    </p>
-                                </a>
-
+                                    <a href="{{ route('admin.contents.show', $topic->id) }}" class="no-underline text-blue-500 hover:underline">
+                                    @if($topic->youtube_thumbnail_url)
+                                        <img src="{{ $topic->youtube_thumbnail_url }}" 
+                                            alt="Video thumbnail" 
+                                            class="img-thumbnail w-60 h-auto max-h-25 object-cover">
+                                    @endif
+                                        <h3 class="group-hover:text-blue-600 font-semibold text-gray-800 dark:text-gray-200">
+                                            {{ $topic->topic_name }}
+                                        </h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $topic->topic_desc }}
+                                        </p>
+                                    </a>
 
                                     <!-- Dropdown for Actions -->
                                     <div class="mt-4 flex justify-end">
@@ -89,16 +93,13 @@
 
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
-                                                    
                                                     <!-- Create Quiz Button -->
-                                                    <a href="{{ route('admin.topics.quiz.index', $topic) }}"
-                                                    class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
+                                                    <a href="{{ route('admin.topics.quiz.index', $topic) }}" class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
                                                         <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                             <path d="M12 5v14M5 12h14"/>
                                                         </svg>
-                                                         Quiz
+                                                        Quiz
                                                     </a>
-
 
                                                     <!-- Edit Action -->
                                                     <a href="#" class="edit-btn flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
@@ -147,35 +148,35 @@
                                 </button>
                             </div>
                             <div class="max-h-[80vh] overflow-y-auto">
-                            <form id="editTopicForm" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" id="edit_topic_id" name="topic_id">
+                                <form id="editTopicForm" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" id="edit_topic_id" name="topic_id">
 
-                                <div class="mb-3">
-                                    <label for="edit_topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
-                                    <input type="text" id="edit_topic_name" name="topic_name" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
-                                    <textarea id="edit_topic_desc" name="topic_desc" rows="3" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
-                                    <textarea id="edit_content" name="content" rows="3" required
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
-                                    <input type="url" id="edit_video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
-                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
-                                </div>
-                                <div class="flex justify-end">
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Topic</button>
-                                </div>
-                            </form>
+                                    <div class="mb-3">
+                                        <label for="edit_topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
+                                        <input type="text" id="edit_topic_name" name="topic_name" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
+                                        <textarea id="edit_topic_desc" name="topic_desc" rows="3" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                        <div id="edit_editor" style="min-height: 200px;" class="border p-2 rounded-md dark:bg-gray-700 dark:text-white"></div>
+                                        <input type="hidden" id="edit_content" name="content">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit_video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
+                                        <input type="url" id="edit_video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Topic</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -184,69 +185,64 @@
         </div>
     </div>
 
-    <script type="module">
-    import { Editor } from 'https://esm.sh/@tiptap/core@2.11.0';
-    import StarterKit from 'https://esm.sh/@tiptap/starter-kit@2.11.0';
-    import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
-    import OrderedList from 'https://esm.sh/@tiptap/extension-ordered-list';
+    
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
-    // Initialize TipTap
-    const editor = new Editor({
-        element: document.querySelector('#tiptap-editor'),
-        extensions: [
-            StarterKit,
-            Placeholder.configure({
-                placeholder: 'Enter topic content...',
-                emptyNodeClass: 'text-gray-500 dark:text-neutral-400'
-            }),
-            OrderedList.configure({
-                HTMLAttributes: {
-                    class: 'list-decimal list-inside text-gray-800 dark:text-white'
+
+    <script>
+        CKEDITOR.replace('editor');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize main editor
+        const editor = new tiptap.Editor({
+            element: document.getElementById('editor'),
+            extensions: [
+                tiptap.StarterKit,
+                tiptap.Placeholder.configure({
+                    placeholder: 'Write your content here...',
+                }),
+            ],
+            content: '',
+            onUpdate: ({ editor }) => {
+                document.getElementById('content').value = editor.getHTML();
+            }
+        });
+
+        // Initialize edit editor
+        let editEditor;
+        
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Initialize or reinitialize the edit editor
+                if (editEditor) {
+                    editEditor.destroy();
                 }
-            })
-        ],
-        content: '', // Initial content (if editing, fetch from DB)
-        onUpdate: ({ editor }) => {
-            document.querySelector('#content').value = editor.getHTML(); // Store HTML content in hidden input
-        }
-    });
+                
+                editEditor = new tiptap.Editor({
+                    element: document.getElementById('edit_editor'),
+                    extensions: [
+                        tiptap.StarterKit,
+                        tiptap.Placeholder.configure({
+                            placeholder: 'Write your content here...',
+                        }),
+                    ],
+                    content: this.dataset.content || '',
+                    onUpdate: ({ editor }) => {
+                        document.getElementById('edit_content').value = editor.getHTML();
+                    }
+                });
 
-    // Optional: Button to toggle ordered list formatting
-    document.querySelector('#toggle-ordered-list')?.addEventListener('click', () => {
-        editor.chain().focus().toggleOrderedList().run();
-    });
-</script>
+                // Set other form values
+                document.getElementById('edit_topic_id').value = this.dataset.id;
+                document.getElementById('edit_topic_name').value = this.dataset.name;
+                document.getElementById('edit_topic_desc').value = this.dataset.desc;
+                document.getElementById('edit_video_url').value = this.dataset.video || '';
+            });
+        });
 
-<!-- Fix ProseMirror Issues -->
-<script type="importmap">
-  {
-    "imports": {
-      "https://esm.sh/v135/prosemirror-model@1.19.3/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs",
-      "https://esm.sh/v135/prosemirror-model@1.21.0/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs",
-      "https://esm.sh/v135/prosemirror-model@1.22.1/es2022/prosemirror-model.mjs": "https://esm.sh/v135/prosemirror-model@1.20.0/es2022/prosemirror-model.mjs"
-    }
-  }
-</script>
-
-<script type="module">
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const desc = this.dataset.desc;
-            const content = this.dataset.content || ''; // Ensure content exists
-
-            document.querySelector('#edit_topic_id').value = id;
-            document.querySelector('#edit_topic_name').value = name;
-            document.querySelector('#edit_topic_desc').value = desc;
-            editor.commands.setContent(content); // Load content into TipTap
+        // Handle form submission
+        document.getElementById('editTopicForm')?.addEventListener('submit', function() {
+            document.getElementById('edit_content').value = editEditor.getHTML();
         });
     });
-
-    document.querySelector('#editTopicForm').addEventListener('submit', function () {
-        document.querySelector('#edit_content').value = editor.getHTML();
-    });
-</script>
-
-
+    </script>
 </x-app-layout>

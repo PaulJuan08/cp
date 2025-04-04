@@ -9,6 +9,7 @@ use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\UsersCoursesController;
 use App\Http\Controllers\ContentsController; 
 use App\Http\Controllers\UsersContentsController; 
+use App\Http\Controllers\UsersQuizController; 
 use App\Http\Controllers\{
     QuizController,
     QuizQuestionController,
@@ -49,8 +50,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('courses', CoursesController::class);
     Route::post('/courses/{course}/add-topic', [CoursesController::class, 'addTopic'])
     ->name('courses.addTopic');
-    // Route::put('/courses/{course}/assign-role', [CoursesController::class, 'assignRole'])
-    //     ->name('courses.assignRole');
+    Route::post('courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
+        ->name('admin.courses.assign-roles');
     Route::put('/courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
     ->name('admin.courses.assign-roles');
 
@@ -105,6 +106,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/courses/{id}', [UsersCoursesController::class, 'show'])->name('users.courses.show');
     Route::get('/users/contents/{id}', [UsersContentsController::class, 'show'])->name('users.contents.show');
 
+    // Quiz Management
+    Route::get('/users/topics/{topic}/quizzes/{quiz}', [UsersQuizController::class, 'show'])
+        ->name('users.quiz.show');
+
+    Route::post('/users/topics/{topic}/quizzes/{quiz}/submit', [UsersQuizController::class, 'submit'])
+        ->name('users.quiz.submit');
 });
 
 

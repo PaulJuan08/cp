@@ -39,13 +39,37 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-
-    // In your User model
     public function accessibleCourses()
     {
         return Course::whereHas('assignedRoles', function($query) {
             $query->where('role_name', $this->role_name);
         });
+    }
+
+    public function hasCompletedTopic($topicId)
+    {
+        // Implement your logic to check if user has completed the topic
+        return $this->completedTopics()->where('topic_id', $topicId)->exists();
+    }
+
+    public function hasPassedQuiz($topicId)
+    {
+        // Implement your logic to check if user has passed the quiz
+        return $this->quizAttempts()
+                    ->where('topic_id', $topicId)
+                    ->where('passed', true)
+                    ->exists();
+    }
+
+    public function completedTopics()
+    {
+        return $this->belongsToMany(Topic::class, 'user_completed_topics')
+                    ->withTimestamps();
+    }
+
+    public function quizAttempts()
+    {
+        return $this->hasMany(QuizAttempt::class);
     }
 
 }

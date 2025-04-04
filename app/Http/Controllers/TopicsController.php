@@ -36,7 +36,7 @@ class TopicsController extends Controller
             'topic_desc' => 'nullable|string',
             'content' => 'nullable|string',
             'audio' => 'nullable|file|mimes:mp3,wav,m4a|max:5120',
-            'video_url' => 'nullable|url|starts_with:https://www.youtube.com/,https://youtu.be/',
+            'video_url' => 'nullable|url|starts_with:https://www.youtube.com,https://youtu.be',
         ]);
 
         // Handle audio file upload
