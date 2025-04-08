@@ -64,7 +64,8 @@ class Topic extends Model
     // Relationship with courses
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'course_topics', 'topic_id', 'course_id')->withTimestamps();
+        return $this->belongsToMany(Course::class, 'course_topics', 
+        'topic_id', 'course_id')->withTimestamps();
     }
 
 
@@ -78,6 +79,48 @@ class Topic extends Model
         return $this->belongsToMany(User::class, 'user_completed_topics')
             ->withPivot(['quiz_attempt_id', 'completed_at'])
             ->withTimestamps();
+    }
+
+    public function isCompletedBy(User $user): bool
+    {
+        return $this->quizzes()
+            ->whereHas('attempts', function($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('passed', true);
+            })
+            ->exists();
+    }
+
+    public function isAccessibleBy(User $user): bool
+    {
+        // First topic is always accessible
+        if ($this->isFirstInCourse()) {
+            return true;
+        }
+        
+        // Subsequent topics require previous completion
+        $prevTopic = $this->getPreviousTopic();
+        return $prevTopic ? $prevTopic->isCompletedBy($user) : false;
+    }
+
+    public function isFirstInCourse(): bool
+    {
+        return $this->courses()
+            ->first()
+            ?->topics()
+            ->orderBy('order')
+            ->first()
+            ?->id === $this->id;
+    }
+
+    public function getPreviousTopic(): ?Topic
+    {
+        return $this->courses()
+            ->first()
+            ?->topics()
+            ->where('order', '<', $this->order)
+            ->orderBy('order', 'desc')
+            ->first();
     }
 
 }

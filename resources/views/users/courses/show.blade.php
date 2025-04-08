@@ -32,7 +32,8 @@
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                     <div class="bg-blue-600 h-2.5 rounded-full" 
-                        style="width: {{ $course->progressForUser(auth()->user()) }}%"></div>
+                        style="width: {{ $course->progressForUser(auth()->user()) }}%">
+                    </div>
                 </div>
             </div>
 
@@ -52,47 +53,55 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($course->topics->sortBy('sequence_order') as $index => $topic)
+                            @foreach ($course->topics as $index => $topic)
                                 @php
-                                    $isCompleted = auth()->user()->hasCompletedTopic($topic) && 
-                                                auth()->user()->hasPassedQuiz($topic->id);
-                                    $isAccessible = $index == 0 || 
-                                                (auth()->user()->hasCompletedTopic($course->topics[$index-1]) && 
-                                                auth()->user()->hasPassedQuiz($course->topics[$index-1]->id));
+                                    $hasPassedQuiz = auth()->user()->hasPassedQuiz($topic->id);
+                                    $isCompleted = auth()->user()->hasCompletedTopic($topic) && $hasPassedQuiz;
+                                    
+                                    // First topic is always accessible
+                                    if ($index === 0) {
+                                        $isAccessible = true;
+                                    } 
+                                    // Subsequent topics require completing previous ones
+                                    else {
+                                        $prevTopic = $course->topics[$index-1];
+                                        $isAccessible = auth()->user()->hasCompletedTopic($prevTopic) && 
+                                                    auth()->user()->hasPassedQuiz($prevTopic->id);
+                                    }
                                 @endphp
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($isAccessible)
-                                                <a href="{{ route('users.contents.show', $topic->id) }}" class="text-sm font-medium text-gray-900 hover:text-blue-600">
-                                                    {{ $topic->topic_name }}
-                                                </a>
-                                            @else
-                                                <span class="text-sm font-medium text-gray-400">{{ $topic->topic_name }}</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($isCompleted)
-                                                <span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>
-                                                @php $isCompleted = true; @endphp
-                                            @elseif($isAccessible)
-                                                <span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>
-                                            @else
-                                                <span class="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 rounded">Locked</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($isAccessible && $topic->quizzes->isNotEmpty())
-                                                @if(!$isCompleted || !$quizPassed)
-                                                    <a href="{{ route('users.quiz.show', [$topic, $topic->quizzes->first()]) }}" 
-                                                       class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
-                                                        {{ $isCompleted ? 'Retake Quiz' : 'Take Quiz' }}
-                                                    </a>
-                                                @endif
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
+
+                                <tr class="hover:bg-gray-50" data-topic-id="{{ $topic->id }}">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        
+                                        @if($isAccessible)
+                                            <a href="{{ route('users.contents.show', $topic->id) }}" 
+                                            class="text-sm font-medium text-gray-900 hover:text-blue-600">
+                                                {{ $topic->topic_name }}
+                                            </a>
+                                        @else
+                                            <span class="text-sm font-medium text-gray-400">{{ $topic->topic_name }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($isCompleted)
+                                            <span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>
+                                        @elseif($isAccessible)
+                                            <span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>
+                                        @else
+                                            <span class="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 rounded">Locked</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($isAccessible && $topic->quizzes->isNotEmpty())
+                                            <a href="{{ route('users.quiz.show', [$topic, $topic->quizzes->first()]) }}" 
+                                            class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
+                                                {{ $isCompleted ? 'Retake Quiz' : 'Take Quiz' }}
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -165,6 +174,45 @@
                         if (result.passed) {
                             retryBtn.classList.add('hidden');
                             closeBtn.textContent = result.next_topic_available ? 'Next Topic' : 'Continue';
+                            
+                            // Update the UI for the completed topic
+                            const completedRow = document.querySelector(`tr[data-topic-id="${result.topic_id}"]`);
+                            if (completedRow) {
+                                // Update status to Completed
+                                completedRow.querySelector('td:nth-child(3)').innerHTML = 
+                                    '<span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>';
+                                
+                                // Update action button
+                                const actionCell = completedRow.querySelector('td:nth-child(4)');
+                                if (actionCell) {
+                                    actionCell.innerHTML = `
+                                        <a href="${actionCell.querySelector('a').href}" 
+                                        class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
+                                            Retake Quiz
+                                        </a>`;
+                                }
+                                
+                                // Unlock next topic if available
+                                if (result.next_topic_available) {
+                                    const nextRow = completedRow.nextElementSibling;
+                                    if (nextRow) {
+                                        // Update status to Available
+                                        nextRow.querySelector('td:nth-child(3)').innerHTML = 
+                                            '<span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>';
+                                        
+                                        // Enable the topic link
+                                        const topicLink = nextRow.querySelector('td:nth-child(2) a');
+                                        if (topicLink) {
+                                            topicLink.classList.remove('text-gray-400');
+                                            topicLink.classList.add('text-gray-900', 'hover:text-blue-600');
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Update progress bar
+                            document.querySelector('.progress-percent').textContent = `${result.progress}%`;
+                            document.querySelector('.progress-bar').style.width = `${result.progress}%`;
                         } else {
                             retryBtn.classList.remove('hidden');
                             closeBtn.textContent = 'Review Material';
@@ -172,21 +220,23 @@
                         
                         modal.classList.remove('hidden');
                         
+                        // Set up button handlers
                         retryBtn.onclick = function() {
                             modal.classList.add('hidden');
-                            window.location.href = this.querySelector('a').href;
+                            window.location.reload();
                         };
                         
                         closeBtn.onclick = function() {
-                            modal.classList.add('hidden');
+                            modxal.classList.add('hidden');
                             if (result.passed && result.next_topic_available) {
                                 window.location.href = result.next_topic_url;
-                            } else if (result.passed) {
+                            } else {
                                 window.location.reload();
                             }
                         };
                         
                     } catch (error) {
+                        console.error('Error:', error);
                         alert('Error submitting quiz: ' + error.message);
                     } finally {
                         submitBtn.disabled = false;

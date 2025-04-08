@@ -25,8 +25,7 @@ class Course extends Model
     public function topics(): BelongsToMany
     {
         return $this->belongsToMany(Topic::class, 'course_topics')
-            ->withPivot('sequence_order')
-            ->orderBy('sequence_order')
+            ->orderBy('topics.id') 
             ->withTimestamps();
     }
 

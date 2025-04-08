@@ -24,7 +24,8 @@ class UsersQuizController extends Controller
             'answers.*' => 'required',
         ]);
         
-        $user = auth()->user();
+        // $user = auth()->user();
+        $user = $request->user();
         $score = $this->calculateScore($quiz, $validated['answers']);
         $totalQuestions = $quiz->questions->count();
         $percentage = ($totalQuestions > 0) ? round(($score / $totalQuestions) * 100) : 0;
@@ -88,7 +89,8 @@ class UsersQuizController extends Controller
                 'error' => $e->getMessage(),
                 'topic_id' => $topic->id,
                 'quiz_id' => $quiz->id,
-                'user_id' => auth()->id()
+                // 'user_id' => auth()->id()
+                'user_id' => $user->id
             ]);
             
             return response()->json([
@@ -118,31 +120,18 @@ class UsersQuizController extends Controller
 
     private function getNextTopic(?Course $course, Topic $currentTopic): ?Topic
     {
-        if (!$course) {
-            return null;
-        }
+        if (!$course) return null;
 
-        // Load the pivot data if not already loaded
-        if (!$currentTopic->relationLoaded('courses')) {
-            $currentTopic->load(['courses' => function($query) use ($course) {
-                $query->where('course_id', $course->id);
-            }]);
-        }
-
-        $currentSequence = optional($currentTopic->courses->first())->pivot->sequence_order;
+        // Get topics ordered by ID
+        $topics = $course->topics()->orderBy('topics.id')->get();
         
-        if (is_null($currentSequence)) {
-            Log::warning('No sequence order found for topic', [
-                'topic_id' => $currentTopic->id,
-                'course_id' => $course->id
-            ]);
-            return null;
-        }
+        // Find current topic position
+        $currentIndex = $topics->search(function($topic) use ($currentTopic) {
+            return $topic->id === $currentTopic->id;
+        });
         
-        return $course->topics()
-            ->wherePivot('sequence_order', '>', (int)$currentSequence)
-            ->orderByPivot('sequence_order')
-            ->first();
+        // Return next topic if exists
+        return $topics[$currentIndex + 1] ?? null;
     }
 
     private function calculateScore(Quiz $quiz, array $userAnswers): int

@@ -47,10 +47,11 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    public function hasCompletedTopic($topicId): bool
+    public function hasCompletedTopic(Topic $topic): bool
     {
-        return $this->completedTopics()->where('topic_id', $topicId)->exists();
+        return $this->completedTopics()->where('topic_id', $topic->id)->exists();
     }
+
 
     public function hasPassedQuiz($topicId): bool
     {
