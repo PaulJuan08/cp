@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Quiz;
 use App\Models\Topic;
+use App\Models\QuizAttempt;
+use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
@@ -90,7 +92,66 @@ class QuizController extends Controller
 
 
     // Quiz Submission Logic
-    
+    // public function submitQuiz(Request $request, $topicId)
+    // {
+    //     $user = auth()->user();
+    //     $topic = Topic::findOrFail($topicId);
+    //     $course = $topic->course;
+        
+    //     // Calculate score
+    //     $totalQuestions = count($request->questions);
+    //     $correctAnswers = 0;
+        
+    //     foreach ($request->questions as $questionId => $answer) {
+    //         $question = QuizQuestion::find($questionId);
+    //         if ($question && $question->correct_answer == $answer) {
+    //             $correctAnswers++;
+    //         }
+    //     }
+        
+    //     $score = ($correctAnswers / $totalQuestions) * 100;
+    //     $passed = $score >= 70;
+        
+    //     // Record quiz attempt
+    //     $quizAttempt = QuizAttempt::create([
+    //         'user_id' => $user->id,
+    //         'topic_id' => $topicId,
+    //         'score' => $score,
+    //         'passed' => $passed
+    //     ]);
+        
+    //     // If passed, mark topic as completed
+    //     if ($passed) {
+    //         $user->completedTopics()->syncWithoutDetaching([$topicId]);
+            
+    //         return response()->json([
+    //             'success' => true,
+    //             'score' => $score,
+    //             'passed' => true,
+    //             'message' => "You scored $correctAnswers out of $totalQuestions ($score%) - Excellent work!",
+    //             'next_topic_url' => $this->getNextTopicUrl($course, $topic)
+    //         ]);
+    //     }
+        
+    //     return response()->json([
+    //         'success' => true,
+    //         'score' => $score,
+    //         'passed' => false,
+    //         'message' => "You scored $correctAnswers out of $totalQuestions ($score%) - Please try again!",
+    //         'retry_url' => route('quiz.show', $topicId)
+    //     ]);
+    // }
+
+    // private function getNextTopicUrl($course, $currentTopic)
+    // {
+    //     $nextTopic = $course->topics()
+    //         ->where('status', 1)
+    //         ->where('id', '>', $currentTopic->id)
+    //         ->orderBy('id')
+    //         ->first();
+        
+    //     return $nextTopic ? route('users.contents.show', $nextTopic->id) : null;
+    // }
 
     
 

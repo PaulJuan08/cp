@@ -2,63 +2,66 @@
 
 namespace App\Models;
 
-use App\Models\Role;
-use App\Models\CourseRole;
-use \App\Models\CourseTopic;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'course_name',
         'course_desc',
         'user_id',
     ];
 
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-    public function topics()
+    public function topics(): BelongsToMany
     {
-        return $this->belongsToMany(Topic::class, 'course_topics', 'course_id', 'topic_id')
+        return $this->belongsToMany(Topic::class, 'course_topics')
+            ->withPivot('sequence_order')
+            ->orderBy('sequence_order')
             ->withTimestamps();
     }
 
-    // If you need many-to-many through users
-    public function users()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'course_roles', 'course_id', 'role_name', 'id', 'role_name')
+        return $this->belongsToMany(User::class, 'course_roles')
             ->using(CourseRole::class)
-            ->withPivot('created_at', 'updated_at');
+            ->withPivot('role_name', 'created_at', 'updated_at');
     }
 
-    // Remove all role-related relationships except:
-    public function assignedRoles()
+    public function assignedRoles(): HasMany
     {
         return $this->hasMany(CourseRole::class);
     }
 
-    // Keep this simple accessor
-    public function getRoleNames()
+    public function getRoleNamesAttribute(): array
     {
         return $this->assignedRoles->pluck('role_name')->unique()->toArray();
     }
-   
+
+    public function progressForUser(User $user): int
+    {
+        // Count only topics where user has passed the quiz
+        $completed = $user->completedTopics()
+            ->whereHas('quizzes.attempts', function($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('passed', true);
+            })
+            ->whereHas('courses', function($query) {
+                $query->where('courses.id', $this->id);
+            })
+            ->count();
+
+        $total = $this->topics()->count();
+
+        return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+    }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Quiz;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class QuizQuestion extends Model
 {
@@ -31,11 +32,12 @@ class QuizQuestion extends Model
      */
     public function answers()
     {
-        return $this->hasMany(QuizAnswer::class, 'question_id');
+        return $this->hasMany(QuizAnswer::class, 'question_id', 'id');
     }
 
-    // public function options()
-    // {
-    //     return $this->hasMany(QuizOption::class, 'question_id');
-    // }
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class);
+    }
+
 }

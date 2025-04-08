@@ -12,7 +12,9 @@ class QuizAttempt extends Model
     protected $fillable = [
         'user_id',
         'topic_id',
+        'quiz_id',
         'score',
+        'total_questions',
         'passed'
     ];
 
@@ -24,5 +26,10 @@ class QuizAttempt extends Model
     public function topic()
     {
         return $this->belongsTo(Topic::class);
+    }
+
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class);
     }
 }

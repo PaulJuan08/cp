@@ -2,25 +2,28 @@
 
 namespace App\Models;
 
-
+use App\Models\QuizQuestion;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Symfony\Component\Console\Question\Question;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Quiz extends Model
 {
-    use HasFactory;
-    
-    protected $fillable = ['topic_id', 'title', 'description'];
+    protected $fillable = ['title', 'description', 'topic_id'];
 
-    public function questions()
-    {
-        return $this->hasMany(QuizQuestion::class);
-    }
-
-
-    public function topic()
+    public function topic(): BelongsTo
     {
         return $this->belongsTo(Topic::class);
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(QuizQuestion::class, 'quiz_id', 'id');
+    }
+
+    public function attempts(): HasMany
+    {
+        return $this->hasMany(QuizAttempt::class, 'quiz_id', 'id');
     }
 }

@@ -3,7 +3,8 @@
 
     <div class="lg:ps-[260px]">
         <div class="container mx-auto p-6">
-            <form id="quiz-form" method="POST" action="{{ route('users.quiz.submit', ['topic' => $topic->id, 'quiz' => $quiz->id]) }}">
+            <form id="quiz-form" method="POST" action="{{ route('users.quiz.submit', 
+            ['topic' => $topic->id, 'quiz' => $quiz->id]) }}">
                 @csrf
                 
                 <div class="mt-6 space-y-4">
@@ -43,42 +44,87 @@
     </div>
     
     <script>
-        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        document.getElementById('quiz-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Submitting...';
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+            `;
             
-            fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Error submitting quiz');
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showScoreModal(data);
+                
+                // Safely handle modal elements
+                const modal = document.getElementById('quizResultModal');
+                const title = document.getElementById('quizResultTitle');
+                const message = document.getElementById('quizResultMessage');
+                const retryBtn = document.getElementById('quizResultRetry');
+                const closeBtn = document.getElementById('quizResultClose');
+                
+                // Check if elements exist before manipulating them
+                if (!modal || !title || !message || !retryBtn || !closeBtn) {
+                    console.error('Modal elements not found');
+                    alert(`You scored ${data.score} out of ${data.total} (${data.percentage}%)\n${data.feedback}`);
+                    window.location.reload();
+                    return;
+                }
+                
+                title.textContent = data.passed ? 'Quiz Passed!' : 'Quiz Results';
+                message.textContent = data.message;
+                
+                if (data.passed) {
+                    retryBtn.classList.add('hidden');
+                    closeBtn.textContent = data.next_topic_available ? 'Next Topic' : 'Continue';
                 } else {
-                    alert('Error submitting quiz');
+                    retryBtn.classList.remove('hidden');
+                    closeBtn.textContent = 'Review Material';
                 }
-            })
-            .catch(error => {
+                
+                modal.classList.remove('hidden');
+                
+                // Set up button handlers
+                retryBtn.onclick = function() {
+                    modal.classList.add('hidden');
+                    window.location.reload();
+                };
+                
+                closeBtn.onclick = function() {
+                    modal.classList.add('hidden');
+                    if (data.passed && data.next_topic_available) {
+                        window.location.href = data.next_topic_url;
+                    } else {
+                        window.location.reload();
+                    }
+                };
+                
+            } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while submitting the quiz');
-            })
-            .finally(() => {
+                alert(error.message);
+            } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit Quiz';
-            });
+                submitBtn.innerHTML = originalText;
+            }
         });
-
-        function showScoreModal(data) {
-            // Implement your modal display logic here
-            alert(`You scored ${data.score} out of ${data.total} (${data.percentage}%)\n${data.feedback}`);
-        }
     </script>
 </x-app-layout>

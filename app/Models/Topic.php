@@ -49,7 +49,7 @@ class Topic extends Model
         
         return isset($matches[1]) ? 'https://img.youtube.com/vi/'.$matches[1].'/0.jpg' : null;
     }
-    
+
 
     /**
      * The attributes that should be cast.
@@ -71,6 +71,13 @@ class Topic extends Model
     public function quizzes()
     {
         return $this->hasMany(Quiz::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_completed_topics')
+            ->withPivot(['quiz_attempt_id', 'completed_at'])
+            ->withTimestamps();
     }
 
 }

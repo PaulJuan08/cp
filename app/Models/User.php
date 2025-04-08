@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Course;
+use App\Models\QuizAttempt;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,25 +47,24 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    public function hasCompletedTopic($topicId)
+    public function hasCompletedTopic($topicId): bool
     {
-        // Implement your logic to check if user has completed the topic
         return $this->completedTopics()->where('topic_id', $topicId)->exists();
     }
 
-    public function hasPassedQuiz($topicId)
+    public function hasPassedQuiz($topicId): bool
     {
-        // Implement your logic to check if user has passed the quiz
         return $this->quizAttempts()
                     ->where('topic_id', $topicId)
                     ->where('passed', true)
                     ->exists();
     }
 
-    public function completedTopics()
+    public function completedTopics(): BelongsToMany
     {
         return $this->belongsToMany(Topic::class, 'user_completed_topics')
-                    ->withTimestamps();
+            ->withPivot(['quiz_attempt_id', 'completed_at'])
+            ->withTimestamps();
     }
 
     public function quizAttempts()
