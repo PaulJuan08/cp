@@ -188,7 +188,7 @@
                     </div>
                 @endif
                 
-                <div class="mt-4 flex justify-end">
+                <div class="mt-10 flex justify-end">
                     <!-- Add Item Button -->
                     <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border 
                     border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none" 
@@ -196,6 +196,8 @@
                         Add Item
                     </button>
                 </div>
+
+                <div class="mt-10"></div>
                 
             </div>
         </div>

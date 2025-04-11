@@ -45,6 +45,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // User Management
     Route::get('/users', [UsersController::class, 'index'])
     ->name('users.index');
+    Route::get('/users/create', [UsersController::class, 'create'])
+    ->name('users.create');
+    Route::post('/users', [UsersController::class, 'store'])
+    ->name('users.store');
+    Route::get('/users/{user}/edit', [UsersController::class, 'edit'])
+    ->name('users.edit');
+    Route::put('/users/{user}', [UsersController::class, 'update'])
+    ->name('users.update');
+    Route::delete('/users/{user}', [UsersController::class, 'destroy'])
+    ->name('users.destroy');
 
     // Courses Management (CRUD)
     Route::resource('courses', CoursesController::class);
@@ -53,7 +63,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
         ->name('admin.courses.assign-roles');
     Route::put('/courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
-    ->name('admin.courses.assign-roles');
+    ->name('admin.courses.update-roles');
+    Route::post('/courses/{course}/removeTopic', [CoursesController::class, 'removeTopic'])
+    ->name('admin.courses.removeTopic');
 
 
     // Contents Management 
@@ -65,6 +77,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Topics Management (CRUD)
     Route::resource('topics', TopicsController::class);
     Route::put('/admin/topics', [TopicsController::class, 'update'])->name('admin.topics.update');
+    
 
     
 
