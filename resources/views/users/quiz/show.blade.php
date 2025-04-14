@@ -19,7 +19,7 @@
                             <div class="grid space-y-2 mt-3">
                                 @foreach($question->answers->shuffle() as $answer)
                                     <label class="max-w-xs flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm">
-                                        <input type="checkbox" 
+                                        <input type="radio"  
                                                name="answers[{{ $question->id }}]" 
                                                value="{{ $answer->id }}"
                                                class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none">

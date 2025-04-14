@@ -52,7 +52,7 @@
                             @foreach ($courses as $course)
                                 <!-- Course Card -->
                                 <div class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-gray-900 dark:border-gray-800 p-4">
-                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:underline">
+                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:no-underline">
                                         <h3 class="group-hover:text-blue-600 font-semibold text-gray-800 dark:text-gray-200">
                                             {{ $course->course_name }}
                                         </h3>

@@ -247,7 +247,10 @@
         </div>
         
         <!-- Modal Footer -->
-        <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2"></div>
+        <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#terms-modal">Close</button>
+          <button type="button" class="btn btn-sm btn-primary" id="accept-terms" data-hs-overlay="#terms-modal">Accept</button>
+        </div>
       </div>
     </div>
   </div>

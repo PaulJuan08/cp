@@ -129,16 +129,25 @@ class CoursesController extends Controller
         return redirect()->back()->with('success', 'Course deleted successfully');
     }
 
-    public function removeTopic(Request $request, Course $course)
+    // public function removeTopic(Request $request, Course $course)
+    // {
+    //     $request->validate([
+    //         'topic_id' => 'required|exists:topics,id'
+    //     ]);
+
+    //     $course->topics()->detach($request->topic_id);
+
+    //     return back()->with('success', 'Topic removed from course successfully');
+    // }
+
+    public function removeTopic($courseId, $topicId)
     {
-        $request->validate([
-            'topic_id' => 'required|exists:topics,id'
-        ]);
+        $course = Course::findOrFail($courseId);
+        $course->topics()->detach($topicId);
 
-        $course->topics()->detach($request->topic_id);
-
-        return redirect()->back()->with('success', 'Topic removed from course successfully');
+        return redirect()->back()->with('success', 'Topic removed from course.');
     }
+
 
 
 }

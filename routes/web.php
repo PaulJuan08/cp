@@ -64,8 +64,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('admin.courses.assign-roles');
     Route::put('/courses/{course}/assign-roles', [CoursesController::class, 'assignRoles'])
     ->name('admin.courses.update-roles');
-    Route::post('/courses/{course}/removeTopic', [CoursesController::class, 'removeTopic'])
-    ->name('admin.courses.removeTopic');
+    Route::delete('/courses/{course}/topics/{topic}/remove', [CoursesController::class, 'removeTopic'])
+        ->name('courses.removeTopic');
 
 
     // Contents Management 
