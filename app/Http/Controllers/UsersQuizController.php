@@ -11,10 +11,31 @@ use Illuminate\Support\Facades\Log;
 
 class UsersQuizController extends Controller
 {
+    const QUESTIONS_TO_SHOW = 10; // Number of questions to display
+
     public function show(Topic $topic, $quizId)
     {
-        $quiz = $topic->quizzes()->findOrFail($quizId);
-        return view('users.quiz.show', compact('quiz', 'topic'));
+        $quiz = $topic->quizzes()
+                    ->with(['questions' => function($query) {
+                        $query->inRandomOrder()
+                            ->take(self::QUESTIONS_TO_SHOW) // Limit here
+                            ->with(['answers' => function($query) {
+                                $query->inRandomOrder();
+                            }]);
+                    }])
+                    ->findOrFail($quizId);
+
+        // Now we can just use all questions since we already limited them
+        $questions = $quiz->questions;
+        $totalQuestions = $quiz->questions()->count(); // Total available questions
+
+        return view('users.quiz.show', [
+            'quiz' => $quiz,
+            'topic' => $topic,
+            'questions' => $questions,
+            'totalQuestions' => $totalQuestions,
+            'questionsToShow' => self::QUESTIONS_TO_SHOW
+        ]);
     }
 
     public function submit(Request $request, Topic $topic, Quiz $quiz)
@@ -24,10 +45,13 @@ class UsersQuizController extends Controller
             'answers.*' => 'required',
         ]);
         
-        // $user = auth()->user();
         $user = $request->user();
+        
+        // Calculate score based on submitted answers
         $score = $this->calculateScore($quiz, $validated['answers']);
-        $totalQuestions = $quiz->questions->count();
+        
+        // Use the count of submitted answers as total questions (since we showed a subset)
+        $totalQuestions = count($validated['answers']);
         $percentage = ($totalQuestions > 0) ? round(($score / $totalQuestions) * 100) : 0;
         $passed = $percentage >= 70; // Passing threshold
         
@@ -38,13 +62,14 @@ class UsersQuizController extends Controller
                 'quiz_id' => $quiz->id,
                 'score' => $score,
                 'total_questions' => $totalQuestions,
-                'passed' => $passed
+                'passed' => $passed,
+                'questions_shown' => $totalQuestions // Store how many questions were shown
             ]);
             
             $responseData = [
                 'success' => true,
                 'score' => $score,
-                'total' => $totalQuestions,
+                'total' => $totalQuestions, // Use the count of questions actually shown
                 'percentage' => $percentage,
                 'passed' => $passed,
                 'message' => "You scored $score out of $totalQuestions ($percentage%)" . 
@@ -89,7 +114,6 @@ class UsersQuizController extends Controller
                 'error' => $e->getMessage(),
                 'topic_id' => $topic->id,
                 'quiz_id' => $quiz->id,
-                // 'user_id' => auth()->id()
                 'user_id' => $user->id
             ]);
             
@@ -100,6 +124,7 @@ class UsersQuizController extends Controller
         }
     }
 
+    // ... keep all other existing methods unchanged ...
     private function calculateCourseProgress(User $user, Course $course): int
     {
         // Count only topics with passed quizzes
@@ -138,17 +163,17 @@ class UsersQuizController extends Controller
     {
         $score = 0;
         
-        foreach ($quiz->questions as $question) {
-            $userAnswer = $userAnswers[$question->id] ?? null;
+        foreach ($userAnswers as $questionId => $answerId) {
+            $isCorrect = $quiz->questions()
+                ->where('id', $questionId)
+                ->whereHas('answers', function($query) use ($answerId) {
+                    $query->where('id', $answerId)
+                          ->where('is_correct', true);
+                })
+                ->exists();
             
-            if ($userAnswer) {
-                $isCorrect = $question->answers()
-                    ->where('id', $userAnswer)
-                    ->value('is_correct');
-                
-                if ($isCorrect) {
-                    $score++;
-                }
+            if ($isCorrect) {
+                $score++;
             }
         }
         

@@ -55,6 +55,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     ->name('users.update');
     Route::delete('/users/{user}', [UsersController::class, 'destroy'])
     ->name('users.destroy');
+    Route::get('/users/{user}', [UsersController::class, 'show'])
+        ->name('users.show');
 
     // Courses Management (CRUD)
     Route::resource('courses', CoursesController::class);
@@ -78,9 +80,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('topics', TopicsController::class);
     Route::put('/admin/topics', [TopicsController::class, 'update'])->name('admin.topics.update');
     
-
-    
-
  
     // Quiz Management (Nested under Topics)
     Route::prefix('topics/{topic}/quiz')->name('topics.quiz.')->group(function () {
@@ -112,12 +111,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // For regular users
 Route::middleware('auth')->group(function () {
     Route::get('/users/dashboard', [UsersController::class, 'dashboard'])->name('users.dashboard');
-    Route::get('/users/dashboard', [UsersController::class, 'userindex'])->name('users.dashboard');
+    // Route::get('/users/dashboard', [UsersController::class, 'userindex'])->name('users.dashboard');
 
     // Courses Management
     Route::get('/users/courses', [UsersCoursesController::class, 'index'])->name('users.courses.index');
     Route::get('/users/courses/{id}', [UsersCoursesController::class, 'show'])->name('users.courses.show');
     Route::get('/users/contents/{id}', [UsersContentsController::class, 'show'])->name('users.contents.show');
+    Route::get('/courses/{course}/certificate', [UsersCoursesController::class, 'certificate'])
+    ->name('users.courses.certificate')
+    ->middleware('auth');
+
+    Route::post('/users/courses/{course}/enroll', [UsersCoursesController::class, 'enroll'])
+        ->name('users.courses.enroll');
+    
+    Route::delete('/users/courses/{course}/unenroll', [UsersCoursesController::class, 'unenroll'])
+        ->name('users.courses.unenroll');
 
     // Quiz Management
     Route::get('/users/topics/{topic}/quizzes/{quiz}', [UsersQuizController::class, 'show'])

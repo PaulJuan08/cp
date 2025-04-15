@@ -29,12 +29,20 @@ class Course extends Model
             ->withTimestamps();
     }
 
+    // public function users(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(User::class, 'course_roles')
+    //         ->using(CourseRole::class)
+    //         ->withPivot('role_name', 'created_at', 'updated_at');
+    // }
+
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'course_roles')
+        return $this->belongsToMany(User::class, 'course_roles', 'course_id', 'user_id')
             ->using(CourseRole::class)
-            ->withPivot('role_name', 'created_at', 'updated_at');
+            ->withPivot('role_name');
     }
+
 
     public function assignedRoles(): HasMany
     {
@@ -46,21 +54,38 @@ class Course extends Model
         return $this->assignedRoles->pluck('role_name')->unique()->toArray();
     }
 
+    // public function progressForUser(User $user): int
+    // {
+    //     // Count only topics where user has passed the quiz
+    //     $completed = $user->completedTopics()
+    //         ->whereHas('quizzes.attempts', function($query) use ($user) {
+    //             $query->where('user_id', $user->id)
+    //                 ->where('passed', true);
+    //         })
+    //         ->whereHas('courses', function($query) {
+    //             $query->where('courses.id', $this->id);
+    //         })
+    //         ->count();
+
+    //     $total = $this->topics()->count();
+
+    //     return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+    // }
+
     public function progressForUser(User $user): int
     {
-        // Count only topics where user has passed the quiz
-        $completed = $user->completedTopics()
-            ->whereHas('quizzes.attempts', function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->where('passed', true);
-            })
-            ->whereHas('courses', function($query) {
-                $query->where('courses.id', $this->id);
-            })
-            ->count();
+        if (!$this->relationLoaded('topics')) {
+            $this->load('topics');
+        }
 
-        $total = $this->topics()->count();
+        $completed = $this->topics->filter(function($topic) use ($user) {
+            return $user->hasCompletedTopic($topic) && 
+                   $user->hasPassedQuiz($topic->id);
+        })->count();
+
+        $total = $this->topics->count();
 
         return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
     }
+
 }

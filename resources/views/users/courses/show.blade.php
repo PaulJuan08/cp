@@ -28,10 +28,10 @@
             <div class="mb-6">
                 <div class="flex justify-between mb-1">
                     <span class="text-sm font-medium text-gray-700">Course Progress</span>
-                    <span class="text-sm font-medium text-gray-700">{{ $course->progressForUser(auth()->user()) }}%</span>
+                    <span class="text-sm font-medium text-gray-700 progress-percent">{{ $course->progressForUser(auth()->user()) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-blue-600 h-2.5 rounded-full" 
+                    <div class="bg-blue-600 h-2.5 rounded-full progress-bar" 
                         style="width: {{ $course->progressForUser(auth()->user()) }}%">
                     </div>
                 </div>
@@ -73,7 +73,6 @@
                                 <tr class="hover:bg-gray-50" data-topic-id="{{ $topic->id }}">
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        
                                         @if($isAccessible)
                                             <a href="{{ route('users.contents.show', $topic->id) }}" 
                                             class="text-sm font-medium text-gray-900 hover:text-blue-600">
@@ -93,10 +92,15 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($isAccessible && $topic->quizzes->isNotEmpty())
+                                        @if($isCompleted)
+                                            <a href="{{ route('users.contents.show', $topic->id) }}" 
+                                            class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
+                                                Review
+                                            </a>
+                                        @elseif($isAccessible && $topic->quizzes->isNotEmpty())
                                             <a href="{{ route('users.quiz.show', [$topic, $topic->quizzes->first()]) }}" 
                                             class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
-                                                {{ $isCompleted ? 'Retake Quiz' : 'Take Quiz' }}
+                                                Take Quiz
                                             </a>
                                         @endif
                                     </td>
@@ -126,8 +130,37 @@
         </div>
     </div>
 
+    <!-- Course Completion Modal -->
+    <div id="courseCompletionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold mt-4 mb-2">Congratulations!</h3>
+                <p class="mb-4">You have successfully completed the course: <strong>{{ $course->course_name }}</strong></p>
+                <div class="flex justify-center space-x-4">
+                    <a href="{{ route('users.courses.certificate', $course->id) }}" 
+                       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        View Certificate
+                    </a>
+                    <button onclick="document.getElementById('courseCompletionModal').classList.add('hidden')" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if course is completed (progress 100%) and show modal
+            const progress = {{ $course->progressForUser(auth()->user()) }};
+            if (progress === 100) {
+                document.getElementById('courseCompletionModal').classList.remove('hidden');
+            }
+
             const quizForm = document.getElementById('quizForm');
             if (quizForm) {
                 quizForm.addEventListener('submit', async function(e) {
@@ -182,13 +215,13 @@
                                 completedRow.querySelector('td:nth-child(3)').innerHTML = 
                                     '<span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>';
                                 
-                                // Update action button
+                                // Update action button to "Review"
                                 const actionCell = completedRow.querySelector('td:nth-child(4)');
                                 if (actionCell) {
                                     actionCell.innerHTML = `
-                                        <a href="${actionCell.querySelector('a').href}" 
-                                        class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
-                                            Retake Quiz
+                                        <a href="{{ route('users.contents.show', '') }}/${result.topic_id}" 
+                                        class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
+                                            Review
                                         </a>`;
                                 }
                                 
@@ -213,6 +246,11 @@
                             // Update progress bar
                             document.querySelector('.progress-percent').textContent = `${result.progress}%`;
                             document.querySelector('.progress-bar').style.width = `${result.progress}%`;
+                            
+                            // Show course completion modal if progress is 100%
+                            if (result.progress === 100) {
+                                document.getElementById('courseCompletionModal').classList.remove('hidden');
+                            }
                         } else {
                             retryBtn.classList.remove('hidden');
                             closeBtn.textContent = 'Review Material';
@@ -227,7 +265,7 @@
                         };
                         
                         closeBtn.onclick = function() {
-                            modxal.classList.add('hidden');
+                            modal.classList.add('hidden');
                             if (result.passed && result.next_topic_available) {
                                 window.location.href = result.next_topic_url;
                             } else {

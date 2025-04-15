@@ -24,7 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'college_department',
         'office_unit',
         'studentID',
-        'stake_holder',
+        'stakeholder',
     ];
 
     protected $hidden = [
@@ -72,5 +72,21 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(QuizAttempt::class);
     }
+
+    // public function courses()
+    // {
+    //     return $this->belongsToMany(Course::class, 'course_roles')
+    //         ->using(CourseRole::class)
+    //         ->withPivot('role_name');
+    // }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_roles', 'user_id', 'course_id')
+            ->using(CourseRole::class)
+            ->withPivot('role_name');
+    }
+
+
 
 }

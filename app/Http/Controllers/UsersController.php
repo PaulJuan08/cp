@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Course;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Blade;
+
 
 class UsersController extends Controller
 {
@@ -15,18 +19,85 @@ class UsersController extends Controller
         return view('admin.users.index', ['users' => $users]);
     }
 
+    // public function userindex()
+    // {
+    //     return view('users.dashboard'); 
+    // }
+
     public function userindex()
     {
-        return view('users.dashboard'); 
+        $user = auth()->user();
+        
+        return view('users.courses.index', [
+            'courses' => Course::whereDoesntHave('users', function($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })->get(),
+            'enrolledCourses' => $user->courses()->get()
+        ]);
     }
+
+    public function enroll(Course $course)
+    {
+        $user = auth()->user();
+        
+        // Check if already enrolled
+        if ($user->courses()->where('course_id', $course->id)->exists()) {
+            return back()->with('error', 'You are already enrolled in this course');
+        }
+        
+        // Enroll the user with default 'Student' role
+        $user->courses()->attach($course->id, [
+            'role_name' => 'Student',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return back()->with('success', 'Successfully enrolled in ' . $course->course_name);
+    }
+
+    public function unenroll(Course $course)
+    {
+        $user = auth()->user();
+        $user->courses()->detach($course->id);
+        
+        return back()->with('success', 'Successfully unenrolled from ' . $course->course_name);
+    }
+
+    // public function dashboard()
+    // {
+    //     $userRole = Auth::user()->role_name;
+        
+    //     return view('user.dashboard', [
+    //         'user' => $userRole,
+    //     ]);
+    // }
 
     public function dashboard()
     {
-        $userRole = Auth::user()->role_name;
+        $user = Auth::user();
         
-        return view('user.dashboard', [
-            'user' => $userRole,
+        // Get courses with progress data and role information
+        $userCourses = $user->courses()
+            ->with(['topics.quizzes.attempts' => function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->get()
+            ->each(function($course) use ($user) {
+                // Manually add the user's role for this course
+                $course->user_role = $course->users()->find($user->id)->pivot->role_name ?? 'Participant';
+            });
+
+        return view('users.dashboard', [
+            'user' => $user,
+            'userCourses' => $userCourses
         ]);
+    }
+
+    public function boot()
+    {
+        Blade::if('role', function ($role) {
+            return auth()->check() && auth()->user()->role_name === $role;
+        });
     }
 
     public function create()
@@ -83,6 +154,11 @@ class UsersController extends Controller
     {
         return view('admin.users.show', ['user' => $user]);
     }
+
+    // public function show(User $user)
+    // {
+    //     return view('admin.users.show', compact('user'));
+    // }
 
     public function edit(User $user)
     {
