@@ -11,11 +11,7 @@
                     <div class="p-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
                         <h3 class="text-lg font-semibold">Welcome back, {{ Auth::user()->name }}!</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-300">
-                            @if(auth()->user()->role_name === 'Student')
-                                You're enrolled in {{ $userCourses->count() }} courses
-                            @else
-                                You have access to {{ $userCourses->count() }} courses
-                            @endif
+                            You have access to {{ $userCourses->count() }} courses
                         </p>
                     </div>
                 </div>
@@ -25,11 +21,7 @@
             <div class="max-w-[85rem] px-4 pb-10 sm:px-6 lg:px-8 mx-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">
-                        @if(auth()->user()->role_name === 'Student')
-                            My Course Progress
-                        @else
-                            Assigned Courses
-                        @endif
+                        My Courses
                     </h3>
                     <a href="{{ route('users.courses.index') }}" class="text-sm text-blue-600 hover:underline">
                         View All Courses
@@ -39,11 +31,7 @@
                 @if($userCourses->isEmpty())
                     <div class="bg-white p-6 rounded-lg shadow-md text-center dark:bg-gray-800">
                         <p class="text-gray-600 dark:text-gray-300">
-                            @if(auth()->user()->role_name === 'Student')
-                                You haven't enrolled in any courses yet.
-                            @else
-                                No courses assigned to you yet.
-                            @endif
+                            No courses assigned to you yet.
                         </p>
                         <a href="{{ route('users.courses.index') }}" class="mt-3 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             Browse Courses
@@ -92,11 +80,7 @@
                                         @if($progressPercent == 100)
                                             Review Course
                                         @else
-                                            @if(auth()->user()->role_name === 'Student')
-                                                Continue Learning
-                                            @else
-                                                View Course
-                                            @endif
+                                            Continue Learning
                                         @endif
                                     </a>
                                 </div>

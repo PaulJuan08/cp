@@ -15,7 +15,13 @@ class Role extends Model
     
     public function courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'course_role', 'role_name', 'course_id')
+        return $this->belongsToMany(Course::class, 'course_roles', 'role_name', 'course_id')
+            ->withTimestamps();
+    }
+    
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'course_roles', 'role_name', 'user_id')
             ->withTimestamps();
     }
 }

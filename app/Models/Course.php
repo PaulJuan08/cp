@@ -29,13 +29,6 @@ class Course extends Model
             ->withTimestamps();
     }
 
-    // public function users(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(User::class, 'course_roles')
-    //         ->using(CourseRole::class)
-    //         ->withPivot('role_name', 'created_at', 'updated_at');
-    // }
-
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'course_roles', 'course_id', 'user_id')
@@ -43,34 +36,24 @@ class Course extends Model
             ->withPivot('role_name');
     }
 
-
+    // Relationship to get all role assignments for this course
     public function assignedRoles(): HasMany
     {
         return $this->hasMany(CourseRole::class);
+    }
+
+    // Relationship to get roles through the course_roles table
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'course_roles', 'course_id', 'role_name')
+            ->withPivot('user_id') // Include user_id if needed
+            ->withTimestamps();
     }
 
     public function getRoleNamesAttribute(): array
     {
         return $this->assignedRoles->pluck('role_name')->unique()->toArray();
     }
-
-    // public function progressForUser(User $user): int
-    // {
-    //     // Count only topics where user has passed the quiz
-    //     $completed = $user->completedTopics()
-    //         ->whereHas('quizzes.attempts', function($query) use ($user) {
-    //             $query->where('user_id', $user->id)
-    //                 ->where('passed', true);
-    //         })
-    //         ->whereHas('courses', function($query) {
-    //             $query->where('courses.id', $this->id);
-    //         })
-    //         ->count();
-
-    //     $total = $this->topics()->count();
-
-    //     return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
-    // }
 
     public function progressForUser(User $user): int
     {
@@ -87,5 +70,4 @@ class Course extends Model
 
         return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
     }
-
 }
