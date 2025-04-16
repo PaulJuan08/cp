@@ -87,6 +87,29 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot('role_name');
     }
 
+    public function topicAccesses()
+    {
+        return $this->hasMany(TopicAccess::class);
+    }
+
+    private function hasPassedTopic(User $user, $topic)
+    {
+        if ($topic->quizzes->isNotEmpty()) {
+            foreach ($topic->quizzes as $quiz) {
+                if ($quiz->attempts->isNotEmpty() && $quiz->attempts->first()->passed) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Check if topicAccesses relationship exists before using it
+        return method_exists($user, 'topicAccesses') 
+            ? $user->topicAccesses()->where('topic_id', $topic->id)->exists()
+            : false;
+    }
+
+    
 
 
 }
