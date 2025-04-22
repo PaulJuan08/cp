@@ -57,6 +57,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     ->name('users.destroy');
     Route::get('/users/{user}', [UsersController::class, 'show'])
         ->name('users.show');
+    
 
     // Courses Management (CRUD)
     Route::resource('courses', CoursesController::class);
@@ -68,6 +69,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     ->name('admin.courses.update-roles');
     Route::delete('/courses/{course}/topics/{topic}/remove', [CoursesController::class, 'removeTopic'])
         ->name('courses.removeTopic');
+
+     // Enrolled Users Management
+    Route::get('/courses/{course}/users', [CoursesController::class, 'showUsers'])
+     ->name('courses.show-users');
 
 
     // Contents Management 

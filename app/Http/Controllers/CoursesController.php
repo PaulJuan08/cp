@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Role;
 use App\Models\Topic;
 use App\Models\Course;
@@ -15,7 +16,7 @@ class CoursesController extends Controller
 {
     public function index()
     {
-        $courses = Course::with('assignedRoles', 'topics')->get();
+        $courses = Course::with('assignedRoles')->get();
         return view('admin.courses.index', compact('courses'));
     }
 
@@ -76,14 +77,26 @@ class CoursesController extends Controller
         try {
             DB::beginTransaction();
             
-            // Remove existing roles
-            $course->assignedRoles()->delete();
+            // Get current unique roles to prevent duplicates
+            $currentRoles = $course->assignedRoles->pluck('role_name')->unique()->toArray();
             
-            // Add new roles if any were selected
-            if (!empty($validated['roles'])) {
+            // Only add roles that aren't already assigned
+            $rolesToAdd = array_diff($validated['roles'] ?? [], $currentRoles);
+            
+            // Remove roles that aren't in the new selection
+            $rolesToRemove = array_diff($currentRoles, $validated['roles'] ?? []);
+            
+            if (!empty($rolesToRemove)) {
+                $course->assignedRoles()
+                    ->whereIn('role_name', $rolesToRemove)
+                    ->delete();
+            }
+            
+            // Add new roles
+            if (!empty($rolesToAdd)) {
                 $rolesToAdd = array_map(function($role) {
                     return ['role_name' => $role];
-                }, $validated['roles']);
+                }, $rolesToAdd);
                 
                 $course->assignedRoles()->createMany($rolesToAdd);
             }
@@ -148,7 +161,66 @@ class CoursesController extends Controller
         return redirect()->back()->with('success', 'Topic removed from course.');
     }
 
+    // Show the list of users enrolled in the course
+    public function showUsers($courseId)
+    {
+        \Log::info("Attempting to fetch users for course: {$courseId}");
+        
+        try {
+            $course = Course::with(['assignedRoles.user'])->findOrFail($courseId);
+            
+            Log::info("Found course: {$course->course_name}");
+            \Log::info("Assigned roles count: " . $course->assignedRoles->count());
+            
+            $enrolledUsers = $course->assignedRoles
+                ->whereNotNull('user_id')
+                ->map(function($role) {
+                    \Log::info("Processing role: {$role->id}, User: " . ($role->user ? $role->user->id : 'null'));
+                    return [
+                        'user_id' => $role->user_id,
+                        'user_name' => $role->user->name ?? 'Unknown User',
+                        'role_name' => $role->role_name
+                    ];
+                })
+                ->values()
+                ->toArray();
+                
+            \Log::info("Returning users: " . json_encode($enrolledUsers));
+            
+            return response()->json([
+                'success' => true,
+                'users' => $enrolledUsers,
+                'course_name' => $course->course_name
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error("Error fetching users: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch users: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
+    // public function removeUser($courseId, $userId)
+    // {
+    //     try {
+    //         $course = Course::findOrFail($courseId);
+            
+    //         // Delete from course_roles table
+    //         $course->assignedRoles()
+    //             ->where('user_id', $userId)
+    //             ->delete();
+            
+    //         return response()->json(['success' => true]);
+            
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to remove user: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
 }
 

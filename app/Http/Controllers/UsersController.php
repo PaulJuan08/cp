@@ -24,21 +24,36 @@ class UsersController extends Controller
         $user = auth()->user();
         $userRole = $user->role_name;
         
-        // Get courses assigned to the user's role
-        $assignedCourses = Course::whereHas('roles', function($query) use ($userRole) {
-            $query->where('name', $userRole);
-        })->get();
+        // Get all courses available to the user (either by role assignment or direct enrollment)
+        $allCourses = Course::query()
+            ->with(['roles', 'users' => function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            }])
+            ->where(function($query) use ($userRole, $user) {
+                // Courses assigned to user's role
+                $query->whereHas('roles', function($q) use ($userRole) {
+                    $q->where('name', $userRole);
+                })
+                // OR courses the user is directly enrolled in
+                ->orWhereHas('users', function($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            })
+            ->get()
+            ->unique('id'); // Ensure no duplicates
 
-        // Get courses the user is enrolled in
-        $enrolledCourses = $user->courses;
-        
-        // Available courses are those assigned to their role but not yet enrolled
-        $availableCourses = $assignedCourses->diff($enrolledCourses);
-        
+        // Separate into role-assigned vs directly enrolled
+        $roleAssignedCourses = $allCourses->filter(function($course) use ($userRole) {
+            return $course->roles->contains('name', $userRole);
+        });
+
+        $directlyEnrolledCourses = $allCourses->filter(function($course) use ($user) {
+            return $course->users->contains('id', $user->id);
+        });
+
         return view('users.courses.index', [
-            'assignedCourses' => $assignedCourses,
-            'availableCourses' => $availableCourses,
-            'enrolledCourses' => $enrolledCourses,
+            'roleAssignedCourses' => $roleAssignedCourses,
+            'directlyEnrolledCourses' => $directlyEnrolledCourses,
             'userRole' => $userRole
         ]);
     }
@@ -47,21 +62,26 @@ class UsersController extends Controller
     {
         $user = auth()->user();
         
+        // Check if already enrolled (either directly or through role)
+        $isEnrolled = $user->courses()
+            ->where('course_id', $course->id)
+            ->exists();
+
+        if ($isEnrolled) {
+            return back()->with('error', 'You already have access to this course');
+        }
+
         // Check if course is assigned to user's role
-        if (!$course->roles()->where('name', $user->role_name)->exists()) {
-            return back()->with('error', 'This course is not available for your role');
-        }
-        
-        // Check if already enrolled
-        if ($user->courses()->where('course_id', $course->id)->exists()) {
-            return back()->with('error', 'You are already enrolled in this course');
-        }
-        
+        $isRoleAssigned = $course->roles()
+            ->where('name', $user->role_name)
+            ->exists();
+
         // Enroll the user
         $user->courses()->attach($course->id, [
             'role_name' => $user->role_name,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
+            'is_direct_enrollment' => !$isRoleAssigned // Mark if this is a direct enrollment
         ]);
         
         return back()->with('success', 'Successfully enrolled in ' . $course->course_name);
@@ -71,8 +91,17 @@ class UsersController extends Controller
     {
         $user = auth()->user();
         
-        // Prevent unenrolling from mandatory role-assigned courses
-        if ($course->roles()->where('name', $user->role_name)->exists()) {
+        // Only allow unenrolling from directly enrolled courses
+        $enrollment = $user->courses()
+            ->where('course_id', $course->id)
+            ->first();
+
+        if (!$enrollment) {
+            return back()->with('error', 'You are not enrolled in this course');
+        }
+
+        // Prevent unenrolling from role-assigned courses
+        if ($enrollment->pivot->is_direct_enrollment === 0) {
             return back()->with('error', 'This course is required for your role and cannot be unenrolled');
         }
         
@@ -212,6 +241,7 @@ class UsersController extends Controller
 
         // Calculate overall metrics
         $metrics = $this->calculateUserMetrics($user);
+        
 
         return view('admin.users.show', [
             'user' => $user,
@@ -238,7 +268,7 @@ class UsersController extends Controller
         $courses = $user->courses()->withCount('topics')->get();
         
         // Calculate total courses
-        $totalCourses = $courses->count();
+        $totalCourses = $courses->count();  
         
         // Calculate completed courses (all topics completed)
         $completedCourses = $courses->filter(function($course) use ($user) {
@@ -254,10 +284,11 @@ class UsersController extends Controller
         // Count completed topics
         $completedTopics = $user->completedTopics()->count();
         
-        
-
-        // Calculate total time spent (in minutes)
-        $totalTimeSpent = $user->topicAccesses()->sum('time_spent') ?? 0;
+        // Calculate quiz statistics
+        $quizAttempts = $user->quizAttempts()->get();
+        $totalQuestions = $quizAttempts->sum('total_questions');
+        $totalCorrectAnswers = $quizAttempts->sum('score');
+        $avgQuizScore = $totalQuestions > 0 ? ($totalCorrectAnswers / $totalQuestions) * 100 : 0;
         
         // Get last activity
         $lastActivity = $user->topicAccesses()->latest()->first();
@@ -267,7 +298,9 @@ class UsersController extends Controller
             'totalCourses' => $totalCourses,
             'completedTopics' => $completedTopics,
             'totalTopics' => $totalTopics,
-            'totalTimeSpent' => $totalTimeSpent,
+            'avgQuizScore' => round($avgQuizScore),
+            'totalQuestions' => $totalQuestions,
+            'totalCorrectAnswers' => $totalCorrectAnswers,
             'lastActivity' => $lastActivity,
         ];
     }
@@ -337,4 +370,6 @@ class UsersController extends Controller
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
     }
+
+    
 }

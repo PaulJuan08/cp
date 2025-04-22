@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\UserSession;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -49,6 +50,39 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->invalidate();
 
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        // Create new session record
+        $session = $user->sessions()->create([
+            'login_at' => now()
+        ]);
+        
+        // Store session ID for logout tracking
+        session(['current_session_id' => $session->id]);
+        
+        return redirect()->intended($this->redirectPath());
+    }
+    
+    public function logout(Request $request)
+    {
+        // Update the session record if exists
+        if ($sessionId = session('current_session_id')) {
+            $session = UserSession::find($sessionId);
+            if ($session) {
+                $session->update([
+                    'logout_at' => now(),
+                    'duration_minutes' => now()->diffInMinutes($session->login_at)
+                ]);
+            }
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/');

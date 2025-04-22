@@ -123,4 +123,9 @@ class Topic extends Model
             ->first();
     }
 
+    public function quizAttempts()
+    {
+        return $this->hasMany(QuizAttempt::class);
+    }
+
 }

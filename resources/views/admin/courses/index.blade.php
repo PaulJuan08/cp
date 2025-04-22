@@ -64,11 +64,24 @@
                                     <!-- Assigned Roles Badges -->
                                     @if($course->assignedRoles->isNotEmpty())
                                         <div class="mt-2 flex flex-wrap gap-1">
-                                            @foreach($course->assignedRoles as $role)
-                                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                            @foreach($course->assignedRoles->unique('role_name') as $role)
+                                                <span class="px-2 py-1 text-xs font-medium 
+                                                    @switch($role->role_name)
+                                                        @case('Faculty') bg-blue-100 text-blue-800 @break
+                                                        @case('Staff') bg-green-100 text-green-800 @break
+                                                        @case('Student') bg-yellow-100 text-yellow-800 @break
+                                                        @default bg-gray-100 text-gray-800
+                                                    @endswitch
+                                                    rounded-full">
                                                     {{ $role->role_name }}
                                                 </span>
                                             @endforeach
+                                        </div>
+                                    @else
+                                        <div class="mt-2">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                No roles assigned
+                                            </span>
                                         </div>
                                     @endif
 
@@ -82,16 +95,22 @@
 
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
-                                                    
                                                     <!-- Assign Role Action -->
                                                     <button type="button" 
                                                         class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
                                                         onclick="openAssignModal(
                                                             '{{ $course->id }}', 
                                                             '{{ $course->course_name }}', 
-                                                            {{ json_encode($course->assignedRoles->pluck('role_name')->toArray()) }}
+                                                            {{ json_encode($course->assignedRoles->pluck('role_name')->unique()->toArray()) }}
                                                         )">
                                                         🎓 Assign Role
+                                                    </button>
+
+                                                    <!-- View Users Who Enrolled this Course -->   
+                                                    <button type="button"
+                                                        class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                        onclick="fetchEnrolledUsers('{{ $course->id }}', '{{ $course->course_name }}')">
+                                                        👥 List of Users Enrolled 
                                                     </button>
 
                                                     <!-- Edit Action -->
@@ -121,6 +140,20 @@
                             @endforeach
                         </div>
                     @endif
+
+                    <!-- List of Users Enrolled in this Course -->
+                    <div id="viewUsersModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white" id="viewUsersModalTitle"></h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    onclick="closeViewUsersModal()">
+                                    ✕
+                                </button>
+                            </div>
+                            <div id="enrolledUsersList"></div>
+                        </div>
+                    </div>
 
                     <!-- Edit Course Modal -->
                     <div id="editcourseModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
@@ -334,5 +367,109 @@
                 submitButton.innerHTML = 'Update Course';
             });
         });
+
+        // View Users Modal Functions
+        function fetchEnrolledUsers(courseId, courseName) {
+            const usersList = document.getElementById('enrolledUsersList');
+            usersList.innerHTML = '<p class="text-gray-500">Loading users...</p>';
+            
+            console.log(`Fetching users for course ${courseId}`); // Debug log
+            
+            fetch(`/admin/courses/${courseId}/users`)
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug log
+                    if (!response.ok) {
+                        // Get the response text to see the actual error
+                        return response.text().then(text => {
+                            console.error('Error response text:', text);
+                            throw new Error(`Server returned ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data); // Debug log
+                    if (data.success) {
+                        openViewUsersModal(courseId, courseName, data.users);
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch enrolled users');
+                    }
+                })
+                .catch(error => {
+                    console.error('Full error:', error); // Debug log
+                    usersList.innerHTML = `
+                        <p class="text-red-500">Error: ${error.message}</p>
+                        <button onclick="fetchEnrolledUsers('${courseId}', '${courseName}')" 
+                            class="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Retry
+                        </button>
+                    `;
+                    document.getElementById('viewUsersModal').classList.remove('hidden');
+                });
+        }
+
+        function openViewUsersModal(courseId, courseName, enrolledUsers) {
+            // Set course name in modal title
+            document.getElementById('viewUsersModalTitle').textContent = 
+                `Users Enrolled in ${courseName} Course`;
+            
+            // Clear previous content
+            const usersList = document.getElementById('enrolledUsersList');
+            usersList.innerHTML = '';
+            
+            // Check if there are enrolled users
+            if (enrolledUsers && enrolledUsers.length > 0) {
+                // Create a table to display users
+                const table = document.createElement('div');
+                table.className = 'overflow-y-auto max-h-[400px]';
+                
+                const tableHeader = `
+                    <div class="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-2">
+                        <div class="col-span-2">ID</div>
+                        <div class="col-span-5">Name</div>
+                        <div class="col-span-3">Role</div>
+                    </div>
+                `;
+                table.innerHTML = tableHeader;
+                
+                // Add each user to the table
+                enrolledUsers.forEach(user => {
+                    const userRow = document.createElement('div');
+                    userRow.className = 'grid grid-cols-12 gap-2 text-sm py-2 px-2 border-t hover:bg-gray-50 dark:hover:bg-gray-700';
+                    userRow.innerHTML = `
+                        <div class="col-span-2 flex items-center">${user.user_id}</div>
+                        <div class="col-span-5 flex items-center">${user.user_name}</div>
+                        <div class="col-span-3">
+                            <span class="px-2 py-1 text-xs rounded-full ${getRoleBadgeClass(user.role_name)}">
+                                ${user.role_name}
+                            </span>
+                        </div>
+                        
+                    `;
+                    table.appendChild(userRow);
+                });
+                
+                usersList.appendChild(table);
+            } else {
+                usersList.innerHTML = '<p class="text-gray-500">No users enrolled in this course yet.</p>';
+            }
+            
+            // Show modal
+            document.getElementById('viewUsersModal').classList.remove('hidden');
+        }
+
+        function getRoleBadgeClass(roleName) {
+            switch(roleName) {
+                case 'Faculty': return 'bg-blue-100 text-blue-800';
+                case 'Staff': return 'bg-green-100 text-green-800';
+                case 'Student': return 'bg-yellow-100 text-yellow-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function closeViewUsersModal() {
+            document.getElementById('viewUsersModal').classList.add('hidden');
+        }
+
     </script>
 </x-app-layout>

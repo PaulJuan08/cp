@@ -22,39 +22,75 @@ class Course extends Model
         'updated_at' => 'datetime',
     ];
 
+    // Topics relationship (unchanged)
     public function topics(): BelongsToMany
     {
         return $this->belongsToMany(Topic::class, 'course_topics')
-            ->orderBy('topics.id') 
+            ->orderBy('topics.id')
             ->withTimestamps();
     }
 
+    // Main users relationship with role filtering capability
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'course_roles', 'course_id', 'user_id')
             ->using(CourseRole::class)
-            ->withPivot('role_name');
+            ->withPivot('role_name')
+            ->distinct();
     }
 
-    // Relationship to get all role assignments for this course
+    // Get users by specific role (e.g., Faculty, Staff, etc.)
+    public function usersByRole(string $role): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'course_roles', 'course_id', 'user_id')
+            ->wherePivot('role_name', $role)
+            ->using(CourseRole::class)
+            ->withPivot('role_name')
+            ->distinct();
+    }
+
+    // Convenience methods for each role type
+    public function faculty(): BelongsToMany
+    {
+        return $this->usersByRole('Faculty');
+    }
+
+    public function staff(): BelongsToMany
+    {
+        return $this->usersByRole('Staff');
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->usersByRole('Student');
+    }
+
+    public function others(): BelongsToMany
+    {
+        return $this->usersByRole('Others');
+    }
+
+    // Relationship to get all unique role assignments
     public function assignedRoles(): HasMany
     {
         return $this->hasMany(CourseRole::class);
     }
 
-    // Relationship to get roles through the course_roles table
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'course_roles', 'course_id', 'role_name')
-            ->withPivot('user_id') // Include user_id if needed
-            ->withTimestamps();
-    }
-
+    // Get all unique role names assigned to this course
     public function getRoleNamesAttribute(): array
     {
-        return $this->assignedRoles->pluck('role_name')->unique()->toArray();
+        return $this->assignedRoles->pluck('role_name')->unique()->values()->toArray();
     }
 
+    // Get all users grouped by their roles
+    public function getUsersGroupedByRole(): \Illuminate\Support\Collection
+    {
+        return $this->users()
+            ->get()
+            ->groupBy('pivot.role_name');
+    }
+
+    // Progress calculation (unchanged)
     public function progressForUser(User $user): int
     {
         if (!$this->relationLoaded('topics')) {
@@ -69,5 +105,12 @@ class Course extends Model
         $total = $this->topics->count();
 
         return $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+    }
+
+    public function enrolledUsers()
+    {
+        return $this->belongsToMany(User::class, 'course_user')
+                    ->withPivot('role_name')
+                    ->withTimestamps();
     }
 }

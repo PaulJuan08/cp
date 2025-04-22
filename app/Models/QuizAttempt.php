@@ -17,6 +17,7 @@ class QuizAttempt extends Model
         'total_questions',
         'passed'
     ];
+    
 
     public function user()
     {
