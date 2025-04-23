@@ -459,19 +459,23 @@
                     </svg>
                 </div>
                 <p class="text-gray-600 dark:text-gray-300 text-center" id="reset-confirmation-text">
-                    Are you sure you want to reset the password for this user? This action cannot be undone.
+                    Are you sure you want to reset the password for this user? A new secure password will be generated and emailed to them.
                 </p>
+                <div id="reset-success-message" class="hidden mt-4 p-3 bg-green-50 rounded-md dark:bg-green-900/30">
+                    <p class="text-sm text-green-700 dark:text-green-300 text-center"></p>
+                </div>
             </div>
             
             <form id="resetUserForm" method="POST">
-                @csrf
-                @method('PUT')
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="resetUserId" name="user_id">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeResetModal()" 
                         class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700">
                         Cancel
                     </button>
-                    <button type="submit" 
+                    <button type="submit" id="resetSubmitBtn"
                         class="px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                         Reset Password
                     </button>
@@ -481,6 +485,114 @@
     </div>
 
     <script>
+        // Initialize variables at the top
+        let currentResetUser = null;
+
+        // Password generator function
+        function generateStrongPassword() {
+            const length = 12;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+            let password = "";
+            for (let i = 0, n = charset.length; i < length; ++i) {
+                password += charset.charAt(Math.floor(Math.random() * n));
+            }
+            return password;
+        }
+
+        // Reset modal functions
+        function openResetModal(userId, userName) {
+            currentResetUser = { 
+                id: userId, 
+                name: userName 
+            };
+            
+            document.getElementById('reset-confirmation-text').textContent = 
+                `Are you sure you want to reset the password for ${userName}? A new secure password will be generated and emailed to them.`;
+            document.getElementById('resetUserId').value = userId;
+            document.getElementById('reset-success-message').classList.add('hidden');
+            document.getElementById('reset-user-modal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-user-modal').classList.add('hidden');
+            currentResetUser = null;
+        }
+
+        // Form submission handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const resetForm = document.getElementById('resetUserForm');
+            
+            if (resetForm) {
+                resetForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    if (!currentResetUser) {
+                        console.error('No user selected for password reset');
+                        return;
+                    }
+                    
+                    const submitBtn = document.getElementById('resetSubmitBtn');
+                    const originalBtnText = submitBtn.innerHTML;
+                    const successMessage = document.getElementById('reset-success-message');
+                    
+                    // Generate a strong password
+                    const newPassword = generateStrongPassword();
+                    
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Resetting...
+                    `;
+                    
+                    try {
+                        const response = await fetch("{{ route('admin.users.reset-password', ['user' => ':userId']) }}".replace(':userId', currentResetUser.id), {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                _method: 'POST',
+                                password: newPassword
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Failed to reset password');
+                        }
+                        
+                        // Show success message
+                        successMessage.querySelector('p').textContent = 
+                            `Password reset successfully! A new password has been emailed to ${currentResetUser.name}.`;
+                        successMessage.classList.remove('hidden');
+                        
+                        // Reset form state after 3 seconds
+                        setTimeout(() => {
+                            closeResetModal();
+                        }, 3000);
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert(`Error: ${error.message}`);
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+        });
+
+        // Make functions available globally for button onclick handlers
+        window.openResetModal = openResetModal;
+        window.closeResetModal = closeResetModal;
+
         // Tab functionality
         function showTab(tabName) {
             // Hide all tab contents
@@ -501,39 +613,5 @@
             document.getElementById(tabName + '-tab').classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300');
             document.getElementById(tabName + '-tab').classList.add('text-blue-600', 'border-blue-500', 'dark:text-blue-400', 'dark:border-blue-400');
         }
-
-        // Reset Password Modal Functions
-        function openResetModal(userId, userName) {
-            document.getElementById('reset-confirmation-text').textContent = 
-                `Are you sure you want to reset the password for ${userName}? This action cannot be undone.`;
-            document.getElementById('resetUserForm').action = `/admin/users/${userId}/reset-password`;
-            document.getElementById('reset-user-modal').classList.remove('hidden');
-            // Add animation classes
-            setTimeout(() => {
-                document.querySelector('#reset-user-modal > div').classList.add('scale-100');
-                document.querySelector('#reset-user-modal > div').classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeResetModal() {
-            // Add exit animation
-            document.querySelector('#reset-user-modal > div').classList.add('scale-95');
-            document.querySelector('#reset-user-modal > div').classList.remove('scale-100');
-            
-            setTimeout(() => {
-                document.getElementById('reset-user-modal').classList.add('hidden');
-            }, 200);
-        }
-        
-        // Filter change handlers
-        document.getElementById('time-filter').addEventListener('change', function() {
-            // Here you would typically fetch new data based on the selected filter
-            console.log('Time filter changed to:', this.value);
-        });
-        
-        document.getElementById('topics-filter').addEventListener('change', function() {
-            // Here you would typically fetch new data based on the selected filter
-            console.log('Topics filter changed to:', this.value);
-        });
     </script>
 </x-app-layout>

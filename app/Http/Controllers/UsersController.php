@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Blade;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class UsersController extends Controller
@@ -371,5 +373,28 @@ class UsersController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
     }
 
+    public function resetPassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|string|min:12'
+        ]);
+
+        // Update user password
+        $newPassword = $request->password;
+        $user->password = Hash::make($newPassword);
+        $user->password_changed_at = now();
+        $user->save();
+
+        // Send email with new password
+        Mail::to($user->email)->send(new PasswordResetMail(
+            $newPassword,
+            $user->name
+        ));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password has been reset and emailed to the user'
+        ]);
+    }
     
 }
