@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\Request;
+// use App\Traits\HasHashedIds;
 
 
 class UserSession extends Model
 {
+    // use HasHashedIds;
     protected $fillable = [
         'user_id',
         'login_at',

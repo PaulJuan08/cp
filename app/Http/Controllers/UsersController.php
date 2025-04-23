@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Blade;
 use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 
 class UsersController extends Controller
@@ -60,66 +62,119 @@ class UsersController extends Controller
         ]);
     }
 
-    public function enroll(Course $course)
-    {
-        $user = auth()->user();
-        
-        // Check if already enrolled (either directly or through role)
-        $isEnrolled = $user->courses()
-            ->where('course_id', $course->id)
-            ->exists();
-
-        if ($isEnrolled) {
-            return back()->with('error', 'You already have access to this course');
-        }
-
-        // Check if course is assigned to user's role
-        $isRoleAssigned = $course->roles()
-            ->where('name', $user->role_name)
-            ->exists();
-
-        // Enroll the user
-        $user->courses()->attach($course->id, [
-            'role_name' => $user->role_name,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'is_direct_enrollment' => !$isRoleAssigned // Mark if this is a direct enrollment
-        ]);
-        
-        return back()->with('success', 'Successfully enrolled in ' . $course->course_name);
-    }
-
-    public function unenroll(Course $course)
-    {
-        $user = auth()->user();
-        
-        // Only allow unenrolling from directly enrolled courses
-        $enrollment = $user->courses()
-            ->where('course_id', $course->id)
-            ->first();
-
-        if (!$enrollment) {
-            return back()->with('error', 'You are not enrolled in this course');
-        }
-
-        // Prevent unenrolling from role-assigned courses
-        if ($enrollment->pivot->is_direct_enrollment === 0) {
-            return back()->with('error', 'This course is required for your role and cannot be unenrolled');
-        }
-        
-        $user->courses()->detach($course->id);
-        
-        return back()->with('success', 'Successfully unenrolled from ' . $course->course_name);
-    }
-
-    // public function dashboard()
+    // public function enroll(Course $course)
     // {
-    //     $userRole = Auth::user()->role_name;
+    //     $user = auth()->user();
         
-    //     return view('user.dashboard', [
-    //         'user' => $userRole,
+    //     // Check if already enrolled (either directly or through role)
+    //     $isEnrolled = $user->courses()
+    //         ->where('course_id', $course->id)
+    //         ->exists();
+
+    //     if ($isEnrolled) {
+    //         return back()->with('error', 'You already have access to this course');
+    //     }
+
+    //     // Check if course is assigned to user's role
+    //     $isRoleAssigned = $course->roles()
+    //         ->where('name', $user->role_name)
+    //         ->exists();
+
+    //     // Enroll the user
+    //     $user->courses()->attach($course->id, [
+    //         'role_name' => $user->role_name,
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //         'is_direct_enrollment' => !$isRoleAssigned // Mark if this is a direct enrollment
     //     ]);
+        
+    //     return back()->with('success', 'Successfully enrolled in ' . $course->course_name);
     // }
+
+    public function enroll($encryptedCourseId)
+    {
+        try {
+            $courseId = Crypt::decrypt($encryptedCourseId);
+            $course = Course::findOrFail($courseId);
+            $user = auth()->user();
+            
+            $isEnrolled = $user->courses()
+                ->where('course_id', $course->id)
+                ->exists();
+
+            if ($isEnrolled) {
+                return back()->with('error', 'You already have access to this course');
+            }
+
+            $isRoleAssigned = $course->roles()
+                ->where('name', $user->role_name)
+                ->exists();
+
+            $user->courses()->attach($course->id, [
+                'role_name' => $user->role_name,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'is_direct_enrollment' => !$isRoleAssigned
+            ]);
+            
+            return back()->with('success', 'Successfully enrolled in ' . $course->course_name);
+            
+        } catch (DecryptException $e) {
+            return back()->with('error', 'Invalid course identifier');
+        }
+    }
+
+    // public function unenroll(Course $course)
+    // {
+    //     $user = auth()->user();
+        
+    //     // Only allow unenrolling from directly enrolled courses
+    //     $enrollment = $user->courses()
+    //         ->where('course_id', $course->id)
+    //         ->first();
+
+    //     if (!$enrollment) {
+    //         return back()->with('error', 'You are not enrolled in this course');
+    //     }
+
+    //     // Prevent unenrolling from role-assigned courses
+    //     if ($enrollment->pivot->is_direct_enrollment === 0) {
+    //         return back()->with('error', 'This course is required for your role and cannot be unenrolled');
+    //     }
+        
+    //     $user->courses()->detach($course->id);
+        
+    //     return back()->with('success', 'Successfully unenrolled from ' . $course->course_name);
+    // }
+
+    public function unenroll($encryptedCourseId)
+    {
+        try {
+            $courseId = Crypt::decrypt($encryptedCourseId);
+            $course = Course::findOrFail($courseId);
+            $user = auth()->user();
+            
+            $enrollment = $user->courses()
+                ->where('course_id', $course->id)
+                ->first();
+
+            if (!$enrollment) {
+                return back()->with('error', 'You are not enrolled in this course');
+            }
+
+            if ($enrollment->pivot->is_direct_enrollment === 0) {
+                return back()->with('error', 'This course is required for your role and cannot be unenrolled');
+            }
+            
+            $user->courses()->detach($course->id);
+            
+            return back()->with('success', 'Successfully unenrolled from ' . $course->course_name);
+            
+        } catch (DecryptException $e) {
+            return back()->with('error', 'Invalid course identifier');
+        }
+    }
+
 
     public function dashboard()
     {
@@ -141,11 +196,23 @@ class UsersController extends Controller
         ]);
     }
 
+    // private function calculateCourseProgress($user, $course)
+    // {
+    //     $completedTopics = $course->topics->filter(function($topic) use ($user) {
+    //         return $user->hasCompletedTopic($topic) && 
+    //                $user->hasPassedQuiz($topic->id);
+    //     })->count();
+
+    //     $totalTopics = $course->topics->count();
+
+    //     return $totalTopics > 0 ? (int) round(($completedTopics / $totalTopics) * 100) : 0;
+    // }
+
     private function calculateCourseProgress($user, $course)
     {
         $completedTopics = $course->topics->filter(function($topic) use ($user) {
             return $user->hasCompletedTopic($topic) && 
-                   $user->hasPassedQuiz($topic->id);
+                   $user->hasPassedQuiz($topic->encrypted_id);
         })->count();
 
         $totalTopics = $course->topics->count();
@@ -153,12 +220,6 @@ class UsersController extends Controller
         return $totalTopics > 0 ? (int) round(($completedTopics / $totalTopics) * 100) : 0;
     }
 
-    // public function boot()
-    // {
-    //     Blade::if('role', function ($role) {
-    //         return auth()->check() && auth()->user()->role_name === $role;
-    //     });
-    // }
 
     public function create()
     {
@@ -210,46 +271,83 @@ class UsersController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
 
+
     // public function show(User $user)
     // {
-    //     return view('admin.users.show', ['user' => $user]);
-    // }
+    //     // Load user with their courses and progress data
+    //     $user->load([
+    //         'courses' => function($query) {
+    //             $query->withCount('topics');
+    //         },
+    //         'courses.topics' => function($query) use ($user) {
+    //             $query->with(['quizzes' => function($q) use ($user) {
+    //                 $q->with(['attempts' => function($a) use ($user) {
+    //                     $a->where('user_id', $user->id)
+    //                     ->orderByDesc('created_at')
+    //                     ->limit(1);
+    //                 }]);
+    //             }]);
+    //         },
+    //         'topicAccesses'
+    //     ]);
 
-    public function show(User $user)
-    {
-        // Load user with their courses and progress data
-        $user->load([
-            'courses' => function($query) {
-                $query->withCount('topics');
-            },
-            'courses.topics' => function($query) use ($user) {
-                $query->with(['quizzes' => function($q) use ($user) {
-                    $q->with(['attempts' => function($a) use ($user) {
-                        $a->where('user_id', $user->id)
-                        ->orderByDesc('created_at')
-                        ->limit(1);
-                    }]);
-                }]);
-            },
-            'topicAccesses'
-        ]);
+    //     // Calculate course progress for each course
+    //     $coursesWithProgress = $user->courses->map(function($course) use ($user) {
+    //         $course->progress = $this->calculateCourseProgress($user, $course);
+    //         $course->lastActivity = $this->getLastActivity($user, $course);
+    //         return $course;
+    //     });
 
-        // Calculate course progress for each course
-        $coursesWithProgress = $user->courses->map(function($course) use ($user) {
-            $course->progress = $this->calculateCourseProgress($user, $course);
-            $course->lastActivity = $this->getLastActivity($user, $course);
-            return $course;
-        });
-
-        // Calculate overall metrics
-        $metrics = $this->calculateUserMetrics($user);
+    //     // Calculate overall metrics
+    //     $metrics = $this->calculateUserMetrics($user);
         
 
-        return view('admin.users.show', [
-            'user' => $user,
-            'courses' => $coursesWithProgress,
-            'metrics' => $metrics
-        ]);
+    //     return view('admin.users.show', [
+    //         'user' => $user,
+    //         'courses' => $coursesWithProgress,
+    //         'metrics' => $metrics
+    //     ]);
+    // }
+
+    public function show($encryptedUserId)
+    {
+        try {
+            $userId = Crypt::decrypt($encryptedUserId);
+            $user = User::findOrFail($userId);
+            
+            $user->load([
+                'courses' => function($query) {
+                    $query->withCount('topics');
+                },
+                'courses.topics' => function($query) use ($user) {
+                    $query->with(['quizzes' => function($q) use ($user) {
+                        $q->with(['attempts' => function($a) use ($user) {
+                            $a->where('user_id', $user->id)
+                            ->orderByDesc('created_at')
+                            ->limit(1);
+                        }]);
+                    }]);
+                },
+                'topicAccesses'
+            ]);
+
+            $coursesWithProgress = $user->courses->map(function($course) use ($user) {
+                $course->progress = $this->calculateCourseProgress($user, $course);
+                $course->lastActivity = $this->getLastActivity($user, $course);
+                return $course;
+            });
+
+            $metrics = $this->calculateUserMetrics($user);
+            
+            return view('admin.users.show', [
+                'user' => $user,
+                'courses' => $coursesWithProgress,
+                'metrics' => $metrics
+            ]);
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid user identifier');
+        }
     }
 
     private function getLastActivity(User $user, Course $course)
@@ -306,95 +404,202 @@ class UsersController extends Controller
             'lastActivity' => $lastActivity,
         ];
     }
-    
 
-    // public function show(User $user)
+    // public function edit(User $user)
     // {
-    //     return view('admin.users.show', compact('user'));
+    //     return view('admin.users.edit', ['user' => $user]);
     // }
 
-    public function edit(User $user)
+    public function edit($encryptedUserId)
     {
-        return view('admin.users.edit', ['user' => $user]);
+        try {
+            $userId = Crypt::decrypt($encryptedUserId);
+            $user = User::findOrFail($userId);
+            return view('admin.users.edit', ['user' => $user]);
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid user identifier');
+        }
     }
 
-    public function update(Request $request, User $user)
+    // public function update(Request $request, User $user)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+    //         'contact' => 'required|string|max:20',
+    //         'role_name' => 'required|string|in:Admin,Faculty,Staff,Student,Others',
+    //         'password' => 'nullable|string|min:8|confirmed',
+    //     ]);
+
+    //     $userData = [
+    //         'name' => $validated['name'],
+    //         'email' => $validated['email'],
+    //         'contact' => $validated['contact'],
+    //         'role_name' => $validated['role_name'],
+    //     ];
+
+    //     // Update password if provided
+    //     if (!empty($validated['password'])) {
+    //         $userData['password'] = Hash::make($validated['password']);
+    //     }
+
+    //     // Update role-specific fields
+    //     if (in_array($validated['role_name'], ['Faculty', 'Staff'])) {
+    //         $userData['employee_id'] = $request->input('employee_id');
+    //     }
+        
+    //     if ($validated['role_name'] === 'Faculty') {
+    //         $userData['department'] = $request->input('department');
+    //     }
+        
+    //     if ($validated['role_name'] === 'Staff') {
+    //         $userData['office_unit'] = $request->input('office_unit');
+    //     }
+        
+    //     if ($validated['role_name'] === 'Student') {
+    //         $userData['student_id'] = $request->input('student_id');
+    //         $userData['college_department'] = $request->input('college_department');
+    //     }
+        
+    //     if ($validated['role_name'] === 'Others') {
+    //         $userData['stakeholder'] = $request->input('stakeholder');
+    //     }
+
+    //     $user->update($userData);
+
+    //     return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+    // }
+
+    public function update(Request $request, $encryptedUserId)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-            'contact' => 'required|string|max:20',
-            'role_name' => 'required|string|in:Admin,Faculty,Staff,Student,Others',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
+        try {
+            $userId = Crypt::decrypt($encryptedUserId);
+            $user = User::findOrFail($userId);
+            
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+                'contact' => 'required|string|max:20',
+                'role_name' => 'required|string|in:Admin,Faculty,Staff,Student,Others',
+                'password' => 'nullable|string|min:8|confirmed',
+            ]);
 
-        $userData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'contact' => $validated['contact'],
-            'role_name' => $validated['role_name'],
-        ];
+            $userData = [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'contact' => $validated['contact'],
+                'role_name' => $validated['role_name'],
+            ];
 
-        // Update password if provided
-        if (!empty($validated['password'])) {
-            $userData['password'] = Hash::make($validated['password']);
-        }
+            if (!empty($validated['password'])) {
+                $userData['password'] = Hash::make($validated['password']);
+            }
 
-        // Update role-specific fields
-        if (in_array($validated['role_name'], ['Faculty', 'Staff'])) {
-            $userData['employee_id'] = $request->input('employee_id');
-        }
-        
-        if ($validated['role_name'] === 'Faculty') {
-            $userData['department'] = $request->input('department');
-        }
-        
-        if ($validated['role_name'] === 'Staff') {
-            $userData['office_unit'] = $request->input('office_unit');
-        }
-        
-        if ($validated['role_name'] === 'Student') {
-            $userData['student_id'] = $request->input('student_id');
-            $userData['college_department'] = $request->input('college_department');
-        }
-        
-        if ($validated['role_name'] === 'Others') {
-            $userData['stakeholder'] = $request->input('stakeholder');
-        }
+            if (in_array($validated['role_name'], ['Faculty', 'Staff'])) {
+                $userData['employee_id'] = $request->input('employee_id');
+            }
+            
+            if ($validated['role_name'] === 'Faculty') {
+                $userData['department'] = $request->input('department');
+            }
+            
+            if ($validated['role_name'] === 'Staff') {
+                $userData['office_unit'] = $request->input('office_unit');
+            }
+            
+            if ($validated['role_name'] === 'Student') {
+                $userData['student_id'] = $request->input('student_id');
+                $userData['college_department'] = $request->input('college_department');
+            }
+            
+            if ($validated['role_name'] === 'Others') {
+                $userData['stakeholder'] = $request->input('stakeholder');
+            }
 
-        $user->update($userData);
+            $user->update($userData);
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+            return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid user identifier');
+        }
     }
 
-    public function destroy(User $user)
+    // public function destroy(User $user)
+    // {
+    //     $user->delete();
+    //     return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
+    // }
+
+    public function destroy($encryptedUserId)
     {
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
+        try {
+            $userId = Crypt::decrypt($encryptedUserId);
+            $user = User::findOrFail($userId);
+            $user->delete();
+            return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid user identifier');
+        }
     }
 
-    public function resetPassword(Request $request, User $user)
+    // public function resetPassword(Request $request, User $user)
+    // {
+    //     $request->validate([
+    //         'password' => 'required|string|min:12'
+    //     ]);
+
+    //     // Update user password
+    //     $newPassword = $request->password;
+    //     $user->password = Hash::make($newPassword);
+    //     $user->password_changed_at = now();
+    //     $user->save();
+
+    //     // Send email with new password
+    //     Mail::to($user->email)->send(new PasswordResetMail(
+    //         $newPassword,
+    //         $user->name
+    //     ));
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Password has been reset and emailed to the user'
+    //     ]);
+    // }
+
+    public function resetPassword(Request $request, $encryptedUserId)
     {
-        $request->validate([
-            'password' => 'required|string|min:12'
-        ]);
+        try {
+            $userId = Crypt::decrypt($encryptedUserId);
+            $user = User::findOrFail($userId);
+            
+            $request->validate([
+                'password' => 'required|string|min:12'
+            ]);
 
-        // Update user password
-        $newPassword = $request->password;
-        $user->password = Hash::make($newPassword);
-        $user->password_changed_at = now();
-        $user->save();
+            $newPassword = $request->password;
+            $user->password = Hash::make($newPassword);
+            $user->password_changed_at = now();
+            $user->save();
 
-        // Send email with new password
-        Mail::to($user->email)->send(new PasswordResetMail(
-            $newPassword,
-            $user->name
-        ));
+            Mail::to($user->email)->send(new PasswordResetMail(
+                $newPassword,
+                $user->name
+            ));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Password has been reset and emailed to the user'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Password has been reset and emailed to the user'
+            ]);
+            
+        } catch (DecryptException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid user identifier'
+            ], 400);
+        }
     }
     
 }

@@ -9,7 +9,7 @@
             Edit Quiz for Topic: {{ $topic->topic_name }}
         </h1>
 
-        <form action="{{ route('admin.topics.quiz.update', [$topic, $quiz]) }}" method="POST">
+        <form action="{{ route('admin.topics.quiz.update', ['topic' => encrypt($topic->id), 'quiz' => encrypt($quiz->id)]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -41,7 +41,7 @@
                     class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
                     Update
                 </button>
-                <a href="{{ route('admin.topics.show', $topic) }}" 
+                <a href="{{ route('admin.topics.show', encrypt($topic->id)) }}" 
                     class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">
                     Cancel
                 </a>

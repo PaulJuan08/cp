@@ -98,7 +98,7 @@
                                                 Review
                                             </a>
                                         @elseif($isAccessible && $topic->quizzes->isNotEmpty())
-                                            <a href="{{ route('users.quiz.show', [$topic, $topic->quizzes->first()]) }}" 
+                                            <a href="{{ route('users.quiz.show', [$topic->id, $topic->quizzes->first()]) }}" 
                                             class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
                                                 Take Quiz
                                             </a>
@@ -140,7 +140,7 @@
                 <h3 class="text-lg font-semibold mt-4 mb-2">Congratulations!</h3>
                 <p class="mb-4">You have successfully completed the course: <strong>{{ $course->course_name }}</strong></p>
                 <div class="flex justify-center space-x-4">
-                    <a href="{{ route('users.courses.certificate', $course->id) }}" 
+                    <a href="{{ route('users.courses.certificate', encrypt($course->id)) }}" 
                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         View Certificate
                     </a>

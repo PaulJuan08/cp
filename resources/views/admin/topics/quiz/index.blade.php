@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6">
         <h2 class="text-2xl font-bold mb-4">Quizzes for Topic: {{ $topic->topic_name }}</h2>
 
-        <!-- Button to create a new quiz -->
-        <a href="{{ route('admin.topics.quiz.create', $topic->id) }}" 
+        <!-- Button to create a new quiz - Fixed route parameter -->
+        <a href="{{ route('admin.topics.quiz.create', ['encryptedTopic' => encrypt($topic->id)]) }}" 
            class="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">Create New Quiz</a>
 
         @if ($quizzes->count() > 0)
@@ -22,11 +22,14 @@
                         <tr>
                             <td class="border border-gray-300 px-4 py-2">{{ $quiz->title }}</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <a href="{{ route('admin.topics.quiz.show', [$topic, $quiz]) }}" 
+                                <!-- View button - Fixed route parameters -->
+                                <a href="{{ route('admin.topics.quiz.show', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
                                    class="bg-green-500 text-white px-3 py-1 rounded">View</a>
-                                <a href="{{ route('admin.topics.quiz.edit', [$topic, $quiz]) }}" 
+                                <!-- Edit button - Fixed route parameters -->
+                                <a href="{{ route('admin.topics.quiz.edit', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
                                    class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
-                                <form action="{{ route('admin.topics.quiz.destroy', [$topic, $quiz]) }}" 
+                                <!-- Delete form - Fixed route parameters -->
+                                <form action="{{ route('admin.topics.quiz.destroy', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
                                       method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')

@@ -9,10 +9,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
+// use App\Traits\HasHashedIds;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
+    // use HasHashedIds;
 
     protected $fillable = [
         'name',
@@ -32,12 +36,35 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = ['encrypted_id'];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the encrypted ID attribute
+     */
+    public function getEncryptedIdAttribute()
+    {
+        return Crypt::encrypt($this->id);
+    }
+
+    /**
+     * Find a user by encrypted ID
+     */
+    public static function findByEncryptedId($encryptedId)
+    {
+        try {
+            $id = Crypt::decrypt($encryptedId);
+            return self::findOrFail($id);
+        } catch (DecryptException $e) {
+            return null;
+        }
     }
 
     public function accessibleCourses()
@@ -53,12 +80,25 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-    public function hasPassedQuiz($topicId): bool
+    // public function hasPassedQuiz($topicId): bool
+    // {
+    //     return $this->quizAttempts()
+    //                 ->where('topic_id', $topicId)
+    //                 ->where('passed', true)
+    //                 ->exists();
+    // }
+
+    public function hasPassedQuiz($encryptedTopicId): bool
     {
-        return $this->quizAttempts()
-                    ->where('topic_id', $topicId)
-                    ->where('passed', true)
-                    ->exists();
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            return $this->quizAttempts()
+                        ->where('topic_id', $topicId)
+                        ->where('passed', true)
+                        ->exists();
+        } catch (DecryptException $e) {
+            return false;
+        }
     }
 
     public function completedTopics(): BelongsToMany
@@ -72,13 +112,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(QuizAttempt::class);
     }
-
-    // public function courses()
-    // {
-    //     return $this->belongsToMany(Course::class, 'course_roles')
-    //         ->using(CourseRole::class)
-    //         ->withPivot('role_name');
-    // }
 
     public function courses()
     {

@@ -42,7 +42,7 @@
                                                     <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                                         <h5 class="font-medium">{{ $quiz->title }}</h5>
                                                         <p class="text-sm">{{ $quiz->description }}</p>
-                                                        <a href="{{ route('users.quiz.show', ['topic' => $topic->id, 'quiz' => $quiz->id]) }}" 
+                                                        <a href="{{ route('users.quiz.show', ['topic' => encrypt($topic->id), 'quiz' => encrypt($quiz->id)]) }}" 
                                                         class="text-blue-500 text-sm mt-1 inline-block">
                                                             Take Quiz
                                                         </a>
@@ -90,7 +90,7 @@
                             <div class="bg-white border shadow-sm rounded-xl p-4 dark:bg-gray-900 dark:border-gray-800 mb-4">
                                 <h3 class="font-semibold text-gray-800 dark:text-white">{{ $topic->topic_name }}</h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $topic->topic_desc }}</p>
-                                <a href="{{ route('users.contents.index', ['id' => $topic->id]) }}" class="text-blue-500 mt-4 block">View Details</a>
+                                <a href="{{ route('users.contents.index', ['id' => encrypt($topic->id)]) }}" class="text-blue-500 mt-4 block">View Details</a>
                             </div>
                         @endforeach
                     </div>

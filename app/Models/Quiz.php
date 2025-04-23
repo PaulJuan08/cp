@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Question\Question;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+// use App\Traits\HasHashedIds;
 
 class Quiz extends Model
 {
+    // use HasHashedIds;
     protected $fillable = ['title', 'description', 'topic_id'];
 
     public function topic(): BelongsTo

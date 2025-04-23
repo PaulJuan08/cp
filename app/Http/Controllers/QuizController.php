@@ -5,87 +5,146 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class QuizController extends Controller
 {
-    // List all quizzes for a given topic
-    public function index(Topic $topic)
+    public function index($encryptedTopicId)
     {
-        $quizzes = Quiz::where('topic_id', $topic->id)->get();
-        return view('admin.topics.quiz.index', compact('topic', 'quizzes'));
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $topic = Topic::findOrFail($topicId);
+            $quizzes = Quiz::where('topic_id', $topic->id)->get();
+            
+            return view('admin.topics.quiz.index', compact('topic', 'quizzes', 'encryptedTopicId'));
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid topic ID');
+        }
     }
 
-    // Show a specific quiz
-    public function show(Topic $topic, Quiz $quiz)
+    public function create($encryptedTopicId)
     {
-        // Load questions along with all their answers
-        $quiz->load(['questions.answers']);
-    
-        return view('admin.topics.quiz.show', compact('topic', 'quiz'));
-    }
-    
-
-
-    // Show the form to create a new quiz
-    public function create(Topic $topic)
-    {
-        return view('admin.topics.quiz.create', compact('topic'));
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $topic = Topic::findOrFail($topicId);
+            
+            return view('admin.topics.quiz.create', compact('topic', 'encryptedTopicId'));
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid topic ID');
+        }
     }
 
-    // Store a new quiz
-    public function store(Request $request, Topic $topic)
+    public function store(Request $request, $encryptedTopicId)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $topic = Topic::findOrFail($topicId);
 
-        // Create the quiz
-        $quiz = Quiz::create([
-            'topic_id' => $topic->id,
-            'title' => $request->title,
-            'description' => $request->description,
-        ]);
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
 
-        return redirect()->route('admin.topics.quiz.index', $topic)
-                         ->with('success', 'Quiz created successfully!');
+            Quiz::create([
+                'topic_id' => $topic->id,
+                'title' => $request->title,
+                'description' => $request->description,
+            ]);
+
+            return redirect()->route('admin.topics.quiz.index', $encryptedTopicId)
+                            ->with('success', 'Quiz created successfully!');
+                            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid topic ID');
+        }
     }
 
-    // Show the edit form
-    public function edit(Topic $topic, Quiz $quiz)
+    public function show($encryptedTopicId, $encryptedQuizId)
     {
-        return view('admin.topics.quiz.edit', compact('topic', 'quiz'));
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $quizId = Crypt::decrypt($encryptedQuizId);
+            
+            $topic = Topic::findOrFail($topicId);
+            $quiz = Quiz::with(['questions.answers'])->findOrFail($quizId);
+            
+            return view('admin.topics.quiz.show', compact('topic', 'quiz', 'encryptedTopicId'));
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid ID');
+        }
     }
 
-    // Update the quiz
-    public function update(Request $request, Topic $topic, Quiz $quiz)
+    public function edit($encryptedTopicId, $encryptedQuizId)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $quiz->update($request->all());
-
-        return redirect()->route('admin.topics.quiz.index', $topic)
-                         ->with('success', 'Quiz updated successfully!');
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $quizId = Crypt::decrypt($encryptedQuizId);
+            
+            $topic = Topic::findOrFail($topicId);
+            $quiz = Quiz::findOrFail($quizId);
+            
+            return view('admin.topics.quiz.edit', compact('topic', 'quiz', 'encryptedTopicId'));
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid ID');
+        }
     }
 
-    // Delete a quiz
-    public function destroy(Topic $topic, Quiz $quiz)
+    public function update(Request $request, $encryptedTopicId, $encryptedQuizId)
     {
-        $quiz->delete();
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $quizId = Crypt::decrypt($encryptedQuizId);
+            
+            $quiz = Quiz::findOrFail($quizId);
 
-        return redirect()->route('admin.topics.quiz.index', $topic)
-                         ->with('success', 'Quiz deleted successfully!');
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
+
+            $quiz->update($request->all());
+
+            return redirect()->route('admin.topics.quiz.index', $encryptedTopicId)
+                            ->with('success', 'Quiz updated successfully!');
+                            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid ID');
+        }
     }
 
-    public function viewAsUser($topicId, $quizId)
+    public function destroy($encryptedTopicId, $encryptedQuizId)
     {
-        $topic = Topic::findOrFail($topicId);
-        $quiz = Quiz::findOrFail($quizId);
+        try {
+            $quizId = Crypt::decrypt($encryptedQuizId);
+            $quiz = Quiz::findOrFail($quizId);
+            $quiz->delete();
 
-        return view('admin.topics.quiz.user_quiz', compact('topic', 'quiz'));
+            return redirect()->route('admin.topics.quiz.index', $encryptedTopicId)
+                            ->with('success', 'Quiz deleted successfully!');
+                            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid quiz ID');
+        }
     }
 
+    public function viewAsUser($encryptedTopicId, $encryptedQuizId)
+    {
+        try {
+            $topicId = Crypt::decrypt($encryptedTopicId);
+            $quizId = Crypt::decrypt($encryptedQuizId);
+            
+            $topic = Topic::findOrFail($topicId);
+            $quiz = Quiz::findOrFail($quizId);
+
+            return view('admin.topics.quiz.user_quiz', compact('topic', 'quiz'));
+            
+        } catch (DecryptException $e) {
+            abort(404, 'Invalid ID');
+        }
+    }
 }

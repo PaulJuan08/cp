@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
+
+// use App\Traits\HasHashedIds;
 
 class Topic extends Model
 {
     use HasFactory;
+    // use HasHashedIds;
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +55,26 @@ class Topic extends Model
         return isset($matches[1]) ? 'https://img.youtube.com/vi/'.$matches[1].'/0.jpg' : null;
     }
 
+    /**
+     * Accessor for getting the encrypted ID
+     */
+    public function getEncryptedIdAttribute()
+    {
+        return Crypt::encrypt($this->id);
+    }
+
+    /**
+     * Find a topic by its encrypted ID
+     */
+    public static function findByEncryptedId($encryptedId)
+    {
+        try {
+            $id = Crypt::decrypt($encryptedId);
+            return self::findOrFail($id);
+        } catch (DecryptException $e) {
+            return null;
+        }
+    }
 
     /**
      * The attributes that should be cast.

@@ -9,7 +9,7 @@
             Create Quiz for Topic: {{ $topic->topic_name }}
         </h1>
 
-        <form action="{{ route('admin.topics.quiz.store', $topic) }}" method="POST">
+        <form action="{{ route('admin.topics.quiz.store', encrypt($topic->id)) }}" method="POST">
             @csrf
 
             <!-- Quiz Title -->
@@ -65,11 +65,11 @@
                                 {{ $quiz->description ?? 'No description' }}
                             </td>
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
-                                <a href="{{ route('admin.topics.quiz.edit', [$topic, $quiz]) }}" class="text-blue-600 hover:underline dark:text-blue-400">
+                                <a href="{{ route('admin.topics.quiz.edit', ['topic' => encrypt($topic->id), 'quiz' => encrypt($quiz->id)]) }}" class="text-blue-600 hover:underline dark:text-blue-400">
                                     Edit
                                 </a>
                                 |
-                                <form action="{{ route('admin.topics.quiz.destroy', [$topic, $quiz]) }}" method="POST" class="inline">
+                                <form action="{{ route('admin.topics.quiz.destroy', ['topic' => encrypt($topic->id), 'quiz' => encrypt($quiz->id)]) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:underline dark:text-red-400" onclick="return confirm('Are you sure?')">

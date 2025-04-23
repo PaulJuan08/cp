@@ -14,12 +14,14 @@
     </p>
     
     <div class="flex space-x-2">
-        <a href="{{ route('users.courses.show', $course->id) }}" 
+        <!-- <a href="{{ route('users.courses.show', $course->id) }}" -->
+        <a href="{{ route('users.courses.show', encrypt($course->id)) }}" 
            class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             View Details
         </a>
         
         @if(!$isEnrolled)
+            <!-- <form action="{{ route('users.courses.enroll', $course->id) }}" method="POST"> -->
             <form action="{{ route('users.courses.enroll', $course->id) }}" method="POST">
                 @csrf
                 <button type="submit" 
@@ -28,7 +30,8 @@
                 </button>
             </form>
         @elseif(!$isAssigned)
-            <form action="{{ route('users.courses.unenroll', $course->id) }}" method="POST">
+            <!-- <form action="{{ route('users.courses.unenroll', $course->id) }}" method="POST"> -->
+            <form action="{{ route('users.courses.unenroll', parameters: $course->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 

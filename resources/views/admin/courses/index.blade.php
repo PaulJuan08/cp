@@ -52,7 +52,8 @@
                             @foreach ($courses as $course)
                                 <!-- Course Card -->
                                 <div class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-gray-900 dark:border-gray-800 p-4">
-                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:no-underline">
+                                    <!-- <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:no-underline"> -->
+                                    <a href="{{ route('admin.courses.show', encrypt($course->id)) }}" class="no-underline text-blue-500 hover:no-underline">
                                         <h3 class="group-hover:text-blue-600 font-semibold text-gray-800 dark:text-gray-200">
                                             {{ $course->course_name }}
                                         </h3>
@@ -117,7 +118,7 @@
                                                     <button type="button" 
                                                         class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
                                                         onclick="openEditModal(
-                                                            '{{ $course->id }}', 
+                                                            '{{ encrypt($course->id) }}', 
                                                             '{{ $course->course_name }}', 
                                                             '{{ $course->course_desc }}'
                                                         )">
@@ -125,7 +126,7 @@
                                                     </button>
 
                                                     <!-- Delete Action -->
-                                                    <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                    <form action="{{ route('admin.courses.destroy', encrypt($course->id)) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
@@ -280,7 +281,7 @@
             document.getElementById('assignRoleModal').classList.add('hidden');
         }
 
-        // Handle form submission
+        // AssignRoleForm event listener 
         document.getElementById('assignRoleForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -304,14 +305,15 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.json().then(err => { throw err; });
                 }
                 return response.json();
             })
             .then(data => {
                 if (data.success) {
                     closeAssignModal();
-                    // Refresh the page to show changes
+                    // Show success message
+                    alert('Roles assigned successfully!');
                     window.location.reload();
                 } else {
                     throw new Error(data.message || 'Failed to save roles');
@@ -319,7 +321,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error saving roles: ' + error.message);
+                alert('Error saving roles: ' + (error.message || 'Unknown error'));
             })
             .finally(() => {
                 submitButton.disabled = false;
@@ -327,40 +329,48 @@
             });
         });
 
-        // Handle edit form submission
+        // EditCourseForm event listener 
         document.getElementById('editCourseForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const form = this;
+            const formData = new FormData(form);
             const submitButton = form.querySelector('button[type="submit"]');
             
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = 'Saving...';
             
+            // Add _method=PUT to the form data
+            formData.append('_method', 'PUT');
+            
             fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
+                method: 'POST', // Still POST because we're using _method override
+                body: formData,
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
                 }
                 return response.json();
             })
             .then(data => {
                 if (data.success) {
                     closeEditModal();
+                    alert('Course updated successfully!');
                     window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to update course');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while saving the course');
+                alert('Error updating course: ' + (error.message || 'Unknown error'));
             })
             .finally(() => {
                 submitButton.disabled = false;

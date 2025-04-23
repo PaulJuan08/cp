@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Crypt;
+// use App\Traits\HasHashedIds;
 
 class Course extends Model
 {
     use HasFactory;
+    // use HasHashedIds;
 
     protected $fillable = [
         'course_name',
@@ -21,6 +25,36 @@ class Course extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($course) {
+            $course->slug = Str::slug($course->name) . '-' . Str::random(6);
+        });
+    }
+
+    // Use slug for route binding
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    // Add these methods for ID encryption/decryption
+    public function getEncryptedIdAttribute()
+    {
+        return encrypt($this->id);
+    }
+
+    public static function findByEncryptedId($encryptedId)
+    {
+        try {
+            $id = decrypt($encryptedId);
+            return self::findOrFail($id);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            abort(404, 'Course not found');
+        }
+    }
 
     // Topics relationship (unchanged)
     public function topics(): BelongsToMany

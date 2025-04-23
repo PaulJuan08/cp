@@ -77,7 +77,8 @@
                             @foreach ($topics as $topic)
                                 <!-- Topic Card -->
                                 <div class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-gray-900 dark:border-gray-800 p-4">
-                                    <a href="{{ route('admin.contents.show', $topic->id) }}" class="no-underline text-blue-500 hover:no-underline">
+                                    <!-- <a href="{{ route('admin.contents.show', $topic->id) }}" class="no-underline text-blue-500 hover:no-underline"> -->
+                                    <a href="{{ route('admin.contents.show', encrypt($topic->id)) }}" class="no-underline text-blue-500 hover:no-underline">
                                     @if($topic->youtube_thumbnail_url)
                                         <img src="{{ $topic->youtube_thumbnail_url }}" 
                                             alt="Video thumbnail" 
@@ -102,7 +103,7 @@
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
                                                     <!-- Create Quiz Button -->
-                                                    <a href="{{ route('admin.topics.quiz.index', $topic) }}" class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
+                                                    <a href="{{ route('admin.topics.quiz.index', encrypt($topic->id)) }}" class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
                                                         <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                             <path d="M12 5v14M5 12h14"/>
                                                         </svg>
@@ -111,7 +112,7 @@
 
                                                     <!-- Edit Action -->
                                                     <a href="#" class="edit-btn flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
-                                                        data-id="{{ $topic->id }}" 
+                                                        data-id="{{ encrypt($topic->id) }}" 
                                                         data-name="{{ $topic->topic_name }}" 
                                                         data-desc="{{ $topic->topic_desc }}" 
                                                         data-content="{{ $topic->content }}" 
@@ -124,7 +125,7 @@
                                                     </a>
 
                                                     <!-- Delete Action -->
-                                                    <form action="{{ route('admin.topics.destroy', $topic->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this topic?');">
+                                                    <form action="{{ route('admin.topics.destroy', encrypt($topic->id)) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this topic?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
@@ -156,7 +157,7 @@
                                 </button>
                             </div>
                             <div class="max-h-[80vh] overflow-y-auto">
-                                <form id="editTopicForm" method="POST">
+                                <form id="editTopicForm" method="POST" action="{{ route('admin.topics.update', encrypt($topic->id)) }}">
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" id="edit_topic_id" name="topic_id">

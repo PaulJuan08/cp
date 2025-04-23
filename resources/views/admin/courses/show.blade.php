@@ -55,7 +55,7 @@
                         </button>
                     </div>
                     <div class="p-6">
-                        <form action="{{ route('admin.courses.addTopic', $course->id) }}" method="POST">
+                        <form action="{{ route('admin.courses.addTopic', encrypt($course->id)) }}" method="POST">
                             @csrf
                             <div class="mb-4">
                                 <label for="topic_id" class="block text-sm font-medium text-gray-700 mb-2">Select Topic</label>
@@ -123,23 +123,14 @@
                                         {{ $topic->id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="{{ route('admin.contents.show', $topic->id) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:no-underline">
+                                        <a href="{{ route('admin.contents.show', encrypt($topic->id)) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:no-underline">
                                             {{ $topic->topic_name }}
                                         </a>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <!-- Edit Button -->
-                                            <!-- <a href="{{ route('admin.topics.edit', $topic->id) }}" 
-                                               class="text-blue-500 hover:text-blue-700 transition"
-                                               title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                            </a> -->
-                                            
                                             <!-- Remove Button -->
-                                            <form action="{{ route('admin.courses.removeTopic', ['course' => $course->id, 'topic' => $topic->id]) }}" method="POST" class="inline">
+                                            <form action="{{ route('admin.courses.removeTopic', ['encryptedCourse' => $course->id, 'encryptedTopic' => $topic->id]) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 

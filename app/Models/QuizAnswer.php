@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// use App\Traits\HasHashedIds;
 
 class QuizAnswer extends Model
 {
     use HasFactory;
+    // use HasHashedIds;
 
     protected $table = 'quiz_answers';
 
