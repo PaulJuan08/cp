@@ -42,7 +42,14 @@
                             </div>
                         </div>
                         <div class="hidden sm:flex space-x-2">
-                            <button type="button" onclick="openResetModal({{ $user->id }}, '{{ $user->name }}')" 
+                            <a href="{{ route('admin.users.edit', Crypt::encrypt($user->id)) }}" 
+                                class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Edit User
+                            </a>
+                            <button type="button" onclick="openResetModal('{{ Crypt::encrypt($user->id) }}', '{{ $user->name }}')" 
                                 class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -86,17 +93,17 @@
 
                                 <div class="sm:col-span-2">
                                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Password</label>
-                                    <p class="mt-1 text-sm font-mono bg-gray-100 dark:bg-neutral-800 p-2 rounded-md overflow-x-auto">{{ $user->password }}</p>
+                                    <p class="mt-1 text-sm font-mono bg-gray-100 dark:bg-neutral-800 p-2 rounded-md overflow-x-auto">••••••••••••</p>
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Created At</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->created_at }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->created_at->format('M d, Y h:i A') }}</p>
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Updated At</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->updated_at }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->updated_at->format('M d, Y h:i A') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -106,10 +113,10 @@
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-neutral-700 pb-2">Additional Information</h3>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                @if($user->employeeID)
+                                @if($user->employee_id)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Employee ID</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ $user->employeeID }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ $user->employee_id }}</p>
                                 </div>
                                 @endif
 
@@ -127,10 +134,10 @@
                                 </div>
                                 @endif
 
-                                @if($user->studentID)
+                                @if($user->student_id)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Student ID</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ $user->studentID }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ $user->student_id }}</p>
                                 </div>
                                 @endif
 
@@ -158,15 +165,6 @@
                     <div class="mb-8">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Learning Progress Summary</h3>
-                            
-                            <!-- Date filter dropdown -->
-                            <!-- <div class="relative">
-                                <select id="time-filter" class="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-md py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="all">All Time</option>
-                                    <option value="month">Last Month</option>
-                                    <option value="week">Last Week</option>
-                                </select>
-                            </div> -->
                         </div>
                         
                         <!-- Progress stats cards -->
@@ -218,13 +216,11 @@
                                     </div>
                                 </div>
                                 <div class="mt-2">
-                                    
                                     @php
                                         $topicPercentage = ($metrics['totalTopics'] ?? 0) > 0 
                                         ? round((($metrics['completedTopics'] ?? 0) / ($metrics['totalTopics'] ?? 1) * 100))
                                         : 0;
                                     @endphp
-
                                     <div class="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
                                         <div class="bg-green-600 h-2 rounded-full" style="width: {{ $topicPercentage }}%"></div>
                                     </div>
@@ -276,7 +272,6 @@
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course Name</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
-                                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Activity</th> -->
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                         </tr>
                                     </thead>
@@ -308,13 +303,6 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    @if($course->lastActivity)
-                                                        {{ $course->lastActivity->created_at->format('M d, Y • h:i A') }}
-                                                    @else
-                                                        No activity yet
-                                                    @endif
-                                                </td> -->
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                         {{ $course->progress == 100 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 
@@ -341,73 +329,34 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @foreach($user->courses as $course)
-                                @foreach($course->topics as $topic)
-                                    @php
-                                        $hasPassed = false;
-                                        $quizScore = null;
-                                        $lastAttempt = null;
-                                        $correctAnswers = 0;
-                                        $totalQuestions = 0;
-                                        
-                                        if ($topic->quizzes->isNotEmpty()) {
-                                            foreach ($topic->quizzes as $quiz) {
-                                                $attempt = $quiz->attempts->where('user_id', $user->id)->sortByDesc('created_at')->first();
-                                                if ($attempt && $attempt->passed) {
-                                                    $hasPassed = true;
-                                                    $correctAnswers = $attempt->score; // Assuming score is number of correct answers
-                                                    $totalQuestions = $attempt->total_questions;
-                                                    $quizScore = $totalQuestions > 0 ? min(round(($correctAnswers / $totalQuestions) * 100), 100) : 0;
-                                                    $lastAttempt = $attempt->created_at;
-                                                }
-                                            }
-                                        } else {
-                                            $access = $user->topicAccesses()->where('topic_id', $topic->id)->first();
-                                            if ($access) {
-                                                $hasPassed = true;
-                                                $lastAttempt = $access->created_at;
-                                            }
-                                        }
-                                    @endphp
-                                    
-                                    @if($hasPassed)
-                                        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-4 hover:shadow-md transition-shadow duration-200">
-                                            <div class="flex justify-between">
-                                                <div class="flex items-center">
-                                                    <div class="bg-green-100 dark:bg-green-900 p-2 rounded-md">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class="ml-3">
-                                                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ $topic->topic_name }}</h4>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $course->course_name }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="text-right">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                                                        Completed
-                                                    </span>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                        {{ $lastAttempt ? $lastAttempt->format('M d, Y') : 'N/A' }}
-                                                    </p>
-                                                </div>
+                            @forelse($recentTopics as $topic)
+                                <div class="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-4 hover:shadow-md transition-shadow duration-200">
+                                    <div class="flex justify-between">
+                                        <div class="flex items-center">
+                                            <div class="bg-green-100 dark:bg-green-900 p-2 rounded-md">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                </svg>
                                             </div>
-                                            @if($quizScore !== null)
-                                                <div class="mt-3">
-                                                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                                        <span>Quiz Score</span>
-                                                        <span>{{ $quizScore }}% ({{ $correctAnswers }}/{{ $totalQuestions }})</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-1.5">
-                                                        <div class="bg-green-600 h-1.5 rounded-full" style="width: {{ $quizScore }}%"></div>
-                                                    </div>
-                                                </div>
-                                            @endif
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ $topic->topic_name }}</h4>
+                                            </div>
                                         </div>
-                                    @endif
-                                @endforeach
-                            @endforeach
+                                        <div class="text-right">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                                                Completed
+                                            </span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                {{ $topic->pivot->created_at->format('M d, Y') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="col-span-2 text-center py-4">
+                                    <p class="text-gray-500 dark:text-gray-400">No recently completed topics found</p>
+                                </div>
+                            @endforelse
                         </div>
                         
                         <div class="mt-4 text-center">
@@ -420,14 +369,14 @@
 
                 <!-- Mobile action buttons -->
                 <div class="sm:hidden border-t border-gray-200 dark:border-neutral-700 p-4 flex justify-end space-x-3">
-                    <a href="{{ route('admin.users.edit', $user->id) }}" 
+                    <a href="{{ route('admin.users.edit', Crypt::encrypt($user->id)) }}" 
                         class="flex-1 flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                         Edit User
                     </a>
-                    <button type="button" onclick="openResetModal({{ $user->id }}, '{{ $user->name }}')" 
+                    <button type="button" onclick="openResetModal('{{ Crypt::encrypt($user->id) }}', '{{ $user->name }}')" 
                         class="flex-1 flex justify-center items-center px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -467,9 +416,8 @@
             </div>
             
             <form id="resetUserForm" method="POST">
-            @csrf
-            @method('PUT')
-            <input type="hidden" id="resetUserId" name="user_id">
+                @csrf
+                <input type="hidden" id="resetUserId" name="user_id">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeResetModal()" 
                         class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700">
@@ -519,25 +467,25 @@
         }
 
         // Form submission handler
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const resetForm = document.getElementById('resetUserForm');
-            
+
             if (resetForm) {
-                resetForm.addEventListener('submit', async function(e) {
+                resetForm.addEventListener('submit', async function (e) {
                     e.preventDefault();
-                    
+
                     if (!currentResetUser) {
                         console.error('No user selected for password reset');
                         return;
                     }
-                    
+
                     const submitBtn = document.getElementById('resetSubmitBtn');
                     const originalBtnText = submitBtn.innerHTML;
                     const successMessage = document.getElementById('reset-success-message');
-                    
+
                     // Generate a strong password
                     const newPassword = generateStrongPassword();
-                    
+
                     // Show loading state
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = `
@@ -547,9 +495,12 @@
                         </svg>
                         Resetting...
                     `;
-                    
+
                     try {
-                        const response = await fetch("{{ route('admin.users.reset-password', ['user' => ':userId']) }}".replace(':userId', currentResetUser.id), {
+                        // Construct the URL dynamically
+                        const resetUrl = `/admin/users/${currentResetUser.id}/reset-password`;
+
+                        const response = await fetch(resetUrl, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -557,27 +508,26 @@
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                _method: 'POST',
                                 password: newPassword
                             })
                         });
 
                         const data = await response.json();
-                        
+
                         if (!response.ok) {
                             throw new Error(data.message || 'Failed to reset password');
                         }
-                        
+
                         // Show success message
-                        successMessage.querySelector('p').textContent = 
+                        successMessage.querySelector('p').textContent =
                             `Password reset successfully! A new password has been emailed to ${currentResetUser.name}.`;
                         successMessage.classList.remove('hidden');
-                        
-                        // Reset form state after 3 seconds
+
+                        // Close modal after delay
                         setTimeout(() => {
                             closeResetModal();
                         }, 3000);
-                        
+
                     } catch (error) {
                         console.error('Error:', error);
                         alert(`Error: ${error.message}`);

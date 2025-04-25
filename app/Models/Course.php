@@ -147,4 +147,9 @@ class Course extends Model
                     ->withPivot('role_name')
                     ->withTimestamps();
     }
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
+    }
 }

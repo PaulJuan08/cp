@@ -4,15 +4,10 @@
     <div class="lg:ps-[240px]">
         <div class="container mx-auto p-6">
             
-            <div class="mt-4 flex justify-end">
-                <!-- View as Users Button -->
-                <a href="{{ route('admin.topics.quiz.user_quiz', [
-                    'encryptedTopic' => encrypt($topic->id), 
-                    'encryptedQuiz' => encrypt($quiz->id)
-                ]) }}" 
-                class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 
-                text-white hover:bg-blue-700 focus:outline-none">
-                    View as Users
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="#" onclick="window.history.back(); return false;" class="text-red-600 no-underline hover:text-red-800 transition">
+                    &larr; Back to Topics
                 </a>
             </div>
 
@@ -172,51 +167,6 @@
                                         @endif
                                     </ul>
                                 @endif
-
-                                <div class="absolute bottom-2 right-2">
-                                    <div class="hs-dropdown relative">
-                                        <button type="button" class="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm 
-                                        font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-none">
-                                            Actions
-                                            <svg class="hs-dropdown-open:rotate-180 size-4" xmlns="http://www.w3.org/2000/svg" width="24" 
-                                            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="m6 9 6 6 6-6"/>
-                                            </svg>
-                                        </button>
-
-                                        <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 
-                                        hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200">
-                                            <div class="p-1 space-y-0.5">
-                                                <!-- Edit Button -->
-                                                <button type="button" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm 
-                                                text-gray-800 hover:bg-gray-100 focus:outline-none edit-question-btn"
-                                                    data-question-id="{{ $question->id }}"
-                                                    data-question-text="{{ $question->question_text }}"
-                                                    data-update-url="{{ route('admin.topics.quiz.questions.update', [
-                                                        'encryptedTopic' => encrypt($topic->id),
-                                                        'encryptedQuiz' => encrypt($quiz->id),
-                                                        'encryptedQuestion' => encrypt($question->id)
-                                                    ]) }}">
-                                                    ✎ Edit
-                                                </button>
-
-                                                <!-- Delete Form -->
-                                                <form action="{{ route('admin.topics.quiz.questions.destroy', [
-                                                    'encryptedTopic' => encrypt($topic->id), 
-                                                    'encryptedQuiz' => encrypt($quiz->id), 
-                                                    'encryptedQuestion' => encrypt($question->id)
-                                                ]) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg 
-                                                    text-sm text-gray-800 hover:bg-gray-100 focus:outline-none">
-                                                        ❌ Delete
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         @endforeach
                     </div>

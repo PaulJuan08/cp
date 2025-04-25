@@ -75,6 +75,9 @@ class UsersCoursesController extends Controller
             $id = Crypt::decrypt($encryptedId);
             $user = Auth::user();
             $userRole = $user->role_name;
+
+            $course = Course::with(['topics.quizzes', /* other relationships */])
+            ->findOrFail($id);
             
             $course = Course::with([
                 'topics',

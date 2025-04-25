@@ -11,12 +11,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
-// use App\Traits\HasHashedIds;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
-    // use HasHashedIds;
 
     protected $fillable = [
         'name',
@@ -46,17 +44,11 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Get the encrypted ID attribute
-     */
     public function getEncryptedIdAttribute()
     {
         return Crypt::encrypt($this->id);
     }
 
-    /**
-     * Find a user by encrypted ID
-     */
     public static function findByEncryptedId($encryptedId)
     {
         try {
@@ -79,26 +71,53 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->completedTopics()->where('topic_id', $topic->id)->exists();
     }
 
-
-    // public function hasPassedQuiz($topicId): bool
-    // {
-    //     return $this->quizAttempts()
-    //                 ->where('topic_id', $topicId)
-    //                 ->where('passed', true)
-    //                 ->exists();
-    // }
-
-    public function hasPassedQuiz($encryptedTopicId): bool
+    public function hasPassedQuiz($topicId): bool
     {
         try {
-            $topicId = Crypt::decrypt($encryptedTopicId);
+            // Handle both encrypted and plain IDs
+            $decryptedId = is_numeric($topicId) ? $topicId : Crypt::decrypt($topicId);
             return $this->quizAttempts()
-                        ->where('topic_id', $topicId)
-                        ->where('passed', true)
-                        ->exists();
+                      ->where('topic_id', $decryptedId)
+                      ->where('passed', true)
+                      ->exists();
         } catch (DecryptException $e) {
             return false;
         }
+    }
+
+    public function calculateCourseProgress(Course $course): int
+    {
+        $completedTopics = $this->completedTopics()
+            ->whereHas('courses', function($query) use ($course) {
+                $query->where('courses.id', $course->id);
+            })
+            ->whereHas('quizzes.attempts', function($query) {
+                $query->where('user_id', $this->id)
+                      ->where('passed', true);
+            })
+            ->count();
+
+        $totalTopics = $course->topics()->count();
+
+        return $totalTopics > 0 ? (int) round(($completedTopics / $totalTopics) * 100) : 0;
+    }
+
+    public function hasCompletedCourse(Course $course): bool
+    {
+        $totalTopics = $course->topics()->count();
+        if ($totalTopics === 0) return false;
+
+        $completedTopics = $this->completedTopics()
+            ->whereHas('courses', function($query) use ($course) {
+                $query->where('courses.id', $course->id);
+            })
+            ->whereHas('quizzes.attempts', function($query) {
+                $query->where('user_id', $this->id)
+                      ->where('passed', true);
+            })
+            ->count();
+
+        return $completedTopics === $totalTopics;
     }
 
     public function completedTopics(): BelongsToMany
@@ -125,22 +144,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(TopicAccess::class);
     }
 
-    private function hasPassedTopic(User $user, $topic)
+    public function getNextAccessibleTopic(Course $course, Topic $currentTopic): ?Topic
     {
-        if ($topic->quizzes->isNotEmpty()) {
-            foreach ($topic->quizzes as $quiz) {
-                if ($quiz->attempts->isNotEmpty() && $quiz->attempts->first()->passed) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        $topics = $course->topics()->orderBy('id')->get();
+        $currentIndex = $topics->search(function($topic) use ($currentTopic) {
+            return $topic->id === $currentTopic->id;
+        });
+
+        if ($currentIndex === false) return null;
+
+        $nextTopic = $topics->get($currentIndex + 1);
         
-        // Check if topicAccesses relationship exists before using it
-        return method_exists($user, 'topicAccesses') 
-            ? $user->topicAccesses()->where('topic_id', $topic->id)->exists()
-            : false;
+        if (!$nextTopic) return null;
+        
+        // Check if user has passed current topic
+        if (!$this->hasPassedQuiz($currentTopic->id)) {
+            return null;
+        }
+
+        return $nextTopic;
     }
-
-
 }

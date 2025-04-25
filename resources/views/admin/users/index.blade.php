@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-100">
                                     <div class="flex gap-2">
-                                        <a href="{{ route('admin.users.show', $user->id) }}" 
+                                        <a href="{{ route('admin.users.show', encrypt($user->id)) }}" 
                                             class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />

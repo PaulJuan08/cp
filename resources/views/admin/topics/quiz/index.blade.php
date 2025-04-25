@@ -2,6 +2,14 @@
     @extends('layouts.admindashboard')
     <div class="lg:ps-[260px]">
     <div class="container mx-auto p-6">
+
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="#" onclick="window.history.back(); return false;" class="text-red-600 no-underline hover:text-red-800 transition">
+                    &larr; Back to Topics
+                </a>
+            </div>
+
         <h2 class="text-2xl font-bold mb-4">Quizzes for Topic: {{ $topic->topic_name }}</h2>
 
         <!-- Button to create a new quiz - Fixed route parameter -->

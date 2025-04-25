@@ -3,8 +3,7 @@
 
     <div class="lg:ps-[260px]">
         <div class="container mx-auto p-6">
-            <form id="quiz-form" method="POST" action="{{ route('users.quiz.submit', 
-            ['topic' => $topic->id, 'quiz' => $quiz->id]) }}">
+            <form id="quiz-form" method="POST" action="{{ route('users.quiz.submit', ['encryptedTopic' => $encryptedTopicId, 'encryptedQuiz' => $encryptedQuizId]) }}">
                 @csrf
                 
                 <div class="mt-6 space-y-4">

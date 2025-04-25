@@ -30,20 +30,19 @@
                                     </div>
 
                                     <div class="mt-6">
-                                        <!-- Toggle Button -->
-                                        <button id="toggleQuizButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
+                                        <!-- Done Button -->
+                                        <button href="#" onclick="window.history.back(); return false;" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
                                             Done
                                         </button>
 
                                         <!-- Quiz Container -->
-                                        <div id="quizContainer" class="hidden mt-4">
+                                        <!-- <div id="quizContainer" class="hidden mt-4">
                                             @if($topic->quizzes && $topic->quizzes->count())
                                                 @foreach($topic->quizzes as $quiz)
                                                     <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                                         <h5 class="font-medium">{{ $quiz->title }}</h5>
                                                         <p class="text-sm">{{ $quiz->description }}</p>
-                                                        <a href="{{ route('users.quiz.show', ['topic' => encrypt($topic->id), 'quiz' => encrypt($quiz->id)]) }}" 
-                                                        class="text-blue-500 text-sm mt-1 inline-block">
+                                                        <a href="{{ route('users.quiz.show', [encrypt($topic->id), encrypt($topic->quizzes->first()->id)]) }}">
                                                             Take Quiz
                                                         </a>
                                                     </div>
@@ -51,7 +50,7 @@
                                             @else
                                                 <p class="text-sm text-gray-500">No quizzes available for this topic.</p>
                                             @endif
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
 
@@ -90,7 +89,7 @@
                             <div class="bg-white border shadow-sm rounded-xl p-4 dark:bg-gray-900 dark:border-gray-800 mb-4">
                                 <h3 class="font-semibold text-gray-800 dark:text-white">{{ $topic->topic_name }}</h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $topic->topic_desc }}</p>
-                                <a href="{{ route('users.contents.index', ['id' => encrypt($topic->id)]) }}" class="text-blue-500 mt-4 block">View Details</a>
+                                <a href="{{ route('users.contents.show', encrypt($topic->id)) }}" class="text-blue-500 mt-4 block">View Details</a>
                             </div>
                         @endforeach
                     </div>

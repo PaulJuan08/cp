@@ -276,7 +276,8 @@ Route::middleware('auth')->group(function () {
     // Courses Management
     Route::get('/users/courses', [UsersCoursesController::class, 'index'])
     ->name('users.courses.index');
-    Route::get('/users/courses/{encryptedCourse}', [UsersCoursesController::class, 'show'])->name('users.courses.show');
+    Route::get('/users/courses/{encryptedCourse}', [UsersCoursesController::class, 'show'])
+    ->name('users.courses.show');
     Route::get('/users/contents/{encryptedTopic}', [UsersContentsController::class, 'show'])
     ->name('users.contents.show');
     Route::get('/courses/{encryptedCourse}/certificate', [UsersCoursesController::class, 'certificate'])
@@ -290,8 +291,9 @@ Route::middleware('auth')->group(function () {
         ->name('users.courses.unenroll');
 
     // Quiz Management
-    Route::get('/users/topics/{encryptedTopic}/quizzes/{encryptedQuiz}', [UsersQuizController::class, 'show'])
-        ->name('users.quiz.show');
+    Route::get('users/topics/{encryptedTopic}/quizzes/{encryptedQuiz}', 
+    [UsersQuizController::class, 'show'])
+    ->name('users.quiz.show');
 
     Route::post('/users/topics/{encryptedTopic}/quizzes/{encryptedQuiz}/submit', [UsersQuizController::class, 'submit'])
         ->name('users.quiz.submit');

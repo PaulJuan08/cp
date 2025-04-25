@@ -3,6 +3,7 @@
 
     <div class="lg:ps-[260px]">
         <div class="min-h-[75rem] p-4 md:p-8">
+
             <div id="scrollspy" class="space-y-10 md:space-y-16">
                 <div id="courses" class="min-h-[25rem] scroll-mt-24">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Courses</h2>

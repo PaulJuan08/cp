@@ -3,6 +3,19 @@
 
     <div class="lg:ps-[260px]">
         <div class="container mx-auto p-6">
+
+            <div class="mt-4 flex justify-end">
+                <!-- View as Users Button -->
+                <a href="{{ route('admin.topics.quiz.user_quiz', [
+                    'encryptedTopic' => encrypt($topic->id), 
+                    'encryptedQuiz' => encrypt($quiz->id)
+                ]) }}" 
+                class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 
+                text-white hover:bg-blue-700 focus:outline-none">
+                    Back
+                </a>
+            </div>
+
             <form action="#" method="POST">
                 @csrf
                 
@@ -48,11 +61,11 @@
                     @endforeach
                 </div>
 
-                <div class="mt-6">
+                <!-- <div class="mt-6">
                     <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                         Submit Quiz
                     </button>
-                </div>
+                </div> -->
             </form>
         </div>
     </div>

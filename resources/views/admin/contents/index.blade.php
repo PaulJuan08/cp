@@ -4,6 +4,14 @@
     <!-- Content -->
     <div class="lg:ps-[260px]">
         <div class="min-h-[75rem] p-4 md:p-8">
+
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="#" onclick="window.history.back(); return false;" class="text-red-600 no-underline hover:text-red-800 transition">
+                    &larr; Back 
+                </a>
+            </div>
+
             <div id="scrollspy" class="space-y-10 md:space-y-16">
 
                 @isset($topic)

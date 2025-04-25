@@ -53,8 +53,12 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($course->topics as $index => $topic)
+                            @foreach ($course->topics->sortBy('id') as $index => $topic)
                                 @php
+                                    // Make sure to load quizzes for each topic
+                                    $topic->load('quizzes');
+                                    $hasQuizzes = $topic->quizzes->isNotEmpty();
+                                    
                                     $hasPassedQuiz = auth()->user()->hasPassedQuiz($topic->id);
                                     $isCompleted = auth()->user()->hasCompletedTopic($topic) && $hasPassedQuiz;
                                     
@@ -64,7 +68,7 @@
                                     } 
                                     // Subsequent topics require completing previous ones
                                     else {
-                                        $prevTopic = $course->topics[$index-1];
+                                        $prevTopic = $course->topics->sortBy('id')[$index-1];
                                         $isAccessible = auth()->user()->hasCompletedTopic($prevTopic) && 
                                                     auth()->user()->hasPassedQuiz($prevTopic->id);
                                     }
@@ -74,7 +78,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($isAccessible)
-                                            <a href="{{ route('users.contents.show', $topic->id) }}" 
+                                            <a href="{{ route('users.contents.show', encrypt($topic->id)) }}" 
                                             class="text-sm font-medium text-gray-900 hover:text-blue-600">
                                                 {{ $topic->topic_name }}
                                             </a>
@@ -93,15 +97,20 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($isCompleted)
-                                            <a href="{{ route('users.contents.show', $topic->id) }}" 
+                                            <a href="{{ route('users.contents.show', encrypt($topic->id)) }}" 
                                             class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
                                                 Review
                                             </a>
-                                        @elseif($isAccessible && $topic->quizzes->isNotEmpty())
-                                            <a href="{{ route('users.quiz.show', [$topic->id, $topic->quizzes->first()]) }}" 
+                                        @elseif($isAccessible && $hasQuizzes)
+                                            <a href="{{ route('users.quiz.show', [
+                                                'encryptedTopic' => encrypt($topic->id),
+                                                'encryptedQuiz' => encrypt($topic->quizzes->first()->id)
+                                            ]) }}" 
                                             class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
                                                 Take Quiz
                                             </a>
+                                        @elseif($isAccessible)
+                                            <span class="text-sm text-gray-500">No quiz available</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -161,6 +170,7 @@
                 document.getElementById('courseCompletionModal').classList.remove('hidden');
             }
 
+            // Handle quiz form submission
             const quizForm = document.getElementById('quizForm');
             if (quizForm) {
                 quizForm.addEventListener('submit', async function(e) {
@@ -184,7 +194,8 @@
                             body: formData,
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json'
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
                         });
                         
@@ -194,84 +205,12 @@
                             throw new Error(result.message || 'Submission failed');
                         }
                         
-                        // Show result in modal
-                        const modal = document.getElementById('quizResultModal');
-                        const title = document.getElementById('quizResultTitle');
-                        const message = document.getElementById('quizResultMessage');
-                        const retryBtn = document.getElementById('quizResultRetry');
-                        const closeBtn = document.getElementById('quizResultClose');
+                        // Update UI elements
+                        updateProgressUI(result);
+                        updateTopicStatusUI(result);
                         
-                        title.textContent = result.passed ? 'Quiz Passed!' : 'Quiz Results';
-                        message.textContent = result.message;
-                        
-                        if (result.passed) {
-                            retryBtn.classList.add('hidden');
-                            closeBtn.textContent = result.next_topic_available ? 'Next Topic' : 'Continue';
-                            
-                            // Update the UI for the completed topic
-                            const completedRow = document.querySelector(`tr[data-topic-id="${result.topic_id}"]`);
-                            if (completedRow) {
-                                // Update status to Completed
-                                completedRow.querySelector('td:nth-child(3)').innerHTML = 
-                                    '<span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>';
-                                
-                                // Update action button to "Review"
-                                const actionCell = completedRow.querySelector('td:nth-child(4)');
-                                if (actionCell) {
-                                    actionCell.innerHTML = `
-                                        <a href="{{ route('users.contents.show', '') }}/${result.topic_id}" 
-                                        class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
-                                            Review
-                                        </a>`;
-                                }
-                                
-                                // Unlock next topic if available
-                                if (result.next_topic_available) {
-                                    const nextRow = completedRow.nextElementSibling;
-                                    if (nextRow) {
-                                        // Update status to Available
-                                        nextRow.querySelector('td:nth-child(3)').innerHTML = 
-                                            '<span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>';
-                                        
-                                        // Enable the topic link
-                                        const topicLink = nextRow.querySelector('td:nth-child(2) a');
-                                        if (topicLink) {
-                                            topicLink.classList.remove('text-gray-400');
-                                            topicLink.classList.add('text-gray-900', 'hover:text-blue-600');
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            // Update progress bar
-                            document.querySelector('.progress-percent').textContent = `${result.progress}%`;
-                            document.querySelector('.progress-bar').style.width = `${result.progress}%`;
-                            
-                            // Show course completion modal if progress is 100%
-                            if (result.progress === 100) {
-                                document.getElementById('courseCompletionModal').classList.remove('hidden');
-                            }
-                        } else {
-                            retryBtn.classList.remove('hidden');
-                            closeBtn.textContent = 'Review Material';
-                        }
-                        
-                        modal.classList.remove('hidden');
-                        
-                        // Set up button handlers
-                        retryBtn.onclick = function() {
-                            modal.classList.add('hidden');
-                            window.location.reload();
-                        };
-                        
-                        closeBtn.onclick = function() {
-                            modal.classList.add('hidden');
-                            if (result.passed && result.next_topic_available) {
-                                window.location.href = result.next_topic_url;
-                            } else {
-                                window.location.reload();
-                            }
-                        };
+                        // Show appropriate modal
+                        showResultModal(result);
                         
                     } catch (error) {
                         console.error('Error:', error);
@@ -281,6 +220,107 @@
                         submitBtn.innerHTML = originalBtnText;
                     }
                 });
+            }
+
+            // Update progress bar and percentage
+            function updateProgressUI(result) {
+                const progressPercent = document.querySelector('.progress-percent');
+                const progressBar = document.querySelector('.progress-bar');
+                
+                if (progressPercent && progressBar) {
+                    progressPercent.textContent = `${result.progress}%`;
+                    progressBar.style.width = `${result.progress}%`;
+                }
+                
+                // Show completion modal if 100%
+                if (result.progress === 100) {
+                    document.getElementById('courseCompletionModal').classList.remove('hidden');
+                }
+            }
+
+            // Update topic status in the table
+            function updateTopicStatusUI(result) {
+                const currentTopicRow = document.querySelector(`tr[data-topic-id="${result.topic_id}"]`);
+                
+                if (!currentTopicRow) return;
+                
+                // Update status cell
+                const statusCell = currentTopicRow.querySelector('td:nth-child(3)');
+                if (statusCell) {
+                    statusCell.innerHTML = result.passed 
+                        ? '<span class="px-2 py-1 text-xs font-semibold text-green-600 bg-green-100 rounded">Completed</span>'
+                        : '<span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>';
+                }
+                
+                // Update action button
+                const actionCell = currentTopicRow.querySelector('td:nth-child(4)');
+                if (actionCell) {
+                    actionCell.innerHTML = result.passed
+                        ? `<a href="{{ route('users.contents.show', '') }}/${result.topic_id}" 
+                            class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
+                                Review
+                           </a>`
+                        : `<a href="{{ route('users.quiz.show', [
+                                'encryptedTopic' => encrypt($topic->id),
+                                'encryptedQuiz' => encrypt(optional($topic->quiz)->id)
+                            ]) }}">Retry Quiz</a>
+
+
+                           </a>`;
+                }
+                
+                // Unlock next topic if available
+                if (result.passed && result.next_topic_available && currentTopicRow.nextElementSibling) {
+                    const nextRow = currentTopicRow.nextElementSibling;
+                    const nextStatusCell = nextRow.querySelector('td:nth-child(3)');
+                    const nextLink = nextRow.querySelector('td:nth-child(2) a');
+                    
+                    if (nextStatusCell) {
+                        nextStatusCell.innerHTML = '<span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>';
+                    }
+                    
+                    if (nextLink) {
+                        nextLink.classList.remove('text-gray-400');
+                        nextLink.classList.add('text-gray-900', 'hover:text-blue-600');
+                    }
+                }
+            }
+
+            // Show quiz result modal
+            function showResultModal(result) {
+                const modal = document.getElementById('quizResultModal');
+                const title = document.getElementById('quizResultTitle');
+                const message = document.getElementById('quizResultMessage');
+                const retryBtn = document.getElementById('quizResultRetry');
+                const closeBtn = document.getElementById('quizResultClose');
+                
+                title.textContent = result.passed ? 'Quiz Passed!' : 'Quiz Results';
+                message.textContent = result.message;
+                
+                if (result.passed) {
+                    retryBtn.classList.add('hidden');
+                    closeBtn.textContent = 'Continue';
+                } else {
+                    retryBtn.classList.remove('hidden');
+                    closeBtn.textContent = 'Review Material';
+                }
+                
+                modal.classList.remove('hidden');
+                
+                // Set up button handlers
+                retryBtn.onclick = function() {
+                    modal.classList.add('hidden');
+                    window.location.reload();
+                };
+                
+                closeBtn.onclick = function() {
+                    modal.classList.add('hidden');
+                    if (result.passed && result.next_topic_available) {
+                        window.location.href = result.next_topic_url;
+                    } else {
+                        window.location.reload();
+                    }
+                };
             }
         });
     </script>
