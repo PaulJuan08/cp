@@ -23,18 +23,3 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error initializing CKEditor:', error);
         });
 });
-<<<<<<< Updated upstream
-
-=======
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-
-
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> parent of c90dbe7 (done major functionalities)
->>>>>>> Stashed changes

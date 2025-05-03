@@ -2,31 +2,15 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< Updated upstream
-=======
-use Illuminate\Http\Request;
-use App\Models\Topic;
-use App\Models\Course;
-use App\Models\User; 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
 use App\Models\Topic;
 use App\Models\User; 
 use App\Models\Course;
+use App\Models\Utility;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> parent of c90dbe7 (done major functionalities)
->>>>>>> Stashed changes
-use Illuminate\Support\Facades\Auth;
 use App\Models\TermsAndCondition;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
@@ -46,7 +30,6 @@ class AdminController extends Controller
         return view('admin.dashboard', ['users' => $users], compact('totalCourses', 'totalTopics', 'totalUsers'));
     }
     
-<<<<<<< Updated upstream
     public function assignCourseToRoles(Request $request, Course $course)
     {
         $validated = $request->validate([
@@ -65,88 +48,87 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Course assigned to roles successfully.');
     }
 
-    // Terms and Conditions Management
-    public function indexTerms()
+
+    // Display all utilities
+    public function utilitiesIndex()
     {
-        $terms = TermsAndCondition::orderBy('created_at', 'desc')->get();
-        return view('admin.terms.index', compact('terms'));
+        $utilities = Utility::paginate(10); // 10 items per page
+        return view('admin.utility.index', compact('utilities'));
     }
 
-    public function createTerms()
+    // Show create form
+    public function createUtility()
     {
-        return view('admin.terms.create');
+        return view('admin.utility.create');
     }
 
-    public function storeTerms(Request $request)
+    // Store new utility
+    public function storeUtility(Request $request)
     {
         $request->validate([
-            'content' => 'required'
+            'type' => 'required|in:terms,privacy,cookies',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'is_published' => 'nullable|boolean'
         ]);
 
-        TermsAndCondition::create([
-            'content' => $request->content,
-            'is_published' => false
-        ]);
-
-        return redirect()->route('admin.terms.index')
-            ->with('success', 'Terms draft created successfully');
-    }
-
-    public function editTerms($id)
-    {
-        $terms = TermsAndCondition::findOrFail($id);
-        return view('admin.terms.edit', compact('terms'));
-    }
-
-    public function updateTerms(Request $request, $id)
-    {
-        $request->validate([
-            'content' => 'required'
-        ]);
-
-        $terms = TermsAndCondition::findOrFail($id);
-        $terms->update([
-            'content' => $request->content
-        ]);
-
-        return redirect()->route('admin.terms.index')
-            ->with('success', 'Terms updated successfully');
-    }
-
-    public function publishTerms($id)
-    {
-        // Unpublish all other terms
-        TermsAndCondition::query()->update(['is_published' => false]);
-        
-        // Publish selected terms
-        $terms = TermsAndCondition::findOrFail($id);
-        $terms->update([
-            'is_published' => true,
-            'published_at' => now()
-        ]);
-
-        return redirect()->route('admin.terms.index')
-            ->with('success', 'Terms published successfully');
-    }
-
-    public function destroyTerms($id)
-    {
-        $terms = TermsAndCondition::findOrFail($id);
-        
-        // Prevent deletion of published terms
-        if ($terms->is_published) {
-            return redirect()->back()
-                ->with('error', 'Cannot delete published terms');
+        // Handle publishing logic
+        if ($request->is_published && $request->type === 'terms') {
+            Utility::where('type', 'terms')->update(['is_published' => false]);
         }
 
-        $terms->delete();
+        Utility::create([
+            'type' => $request->type,
+            'title' => $request->title,
+            'content' => $request->content,
+            'is_published' => $request->is_published ?? false
+        ]);
 
-        return redirect()->route('admin.terms.index')
-            ->with('success', 'Terms deleted successfully');
+        return redirect()->route('admin.utilities.index')
+            ->with('success', 'Utility created successfully!');
     }
 
-    
-=======
->>>>>>> Stashed changes
+    // Show edit form
+    public function editUtility(Utility $utility)
+    {
+        return view('admin.utility.edit', compact('utility'));
+    }
+
+    // Update utility
+    public function updateUtility(Request $request, Utility $utility)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $utility->update($validated);
+
+        return redirect()->route('admin.utilities.index')
+            ->with('success', 'Utility updated successfully.');
+    }
+
+    // Toggle publish status
+    public function togglePublish(Utility $utility)
+    {
+        // If publishing a terms policy, unpublish all other terms policies
+        if ($utility->type === 'terms' && !$utility->is_published) {
+            Utility::where('type', 'terms')
+                ->where('id', '!=', $utility->id)
+                ->update(['is_published' => false]);
+        }
+
+        $utility->update(['is_published' => !$utility->is_published]);
+        
+        return back()->with('success', 'Publish status updated.');
+    }
+
+    // Delete utility
+    public function deleteUtility(Utility $utility)
+    {
+        $utility->delete();
+        return back()->with('success', 'Utility deleted successfully.');
+    }
+
 }
 

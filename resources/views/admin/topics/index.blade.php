@@ -27,7 +27,7 @@
                                 </button>
                             </div>
                             <div class="max-h-[80vh] overflow-y-auto">
-<<<<<<< Updated upstream
+
                                 <form action="{{ route('admin.topics.store') }}" method="POST">
                                     @csrf
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -66,7 +66,7 @@
                                         </button>
                                     </div>
                                 </form>
-=======
+
                             <form action="{{ route('admin.topics.store') }}" method="POST" >
                                 @csrf
                                 <div class="mb-3">
@@ -130,7 +130,45 @@
                                 <div class="mt-4">
                                     <iframe width="100%" height="315" id="modalVideo" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 </div>
->>>>>>> Stashed changes
+
+                                <form action="{{ route('admin.topics.store') }}" method="POST">
+                                    @csrf
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label for="topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                                            <input type="text" id="topic_name" name="topic_name" required
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                        <div>
+                                            <label for="video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
+                                            <input type="url" name="video_url" 
+                                                placeholder="https://www.youtube.com/watch?v=..."
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                        <textarea id="topic_desc" name="topic_desc" rows="3" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                                        <div id="editor" class="ckeditor-classic"></div>
+                                        <textarea id="content" name="content" class="hidden">{{ old('content') }}</textarea>
+                                    </div>
+                                    
+                                    <div class="flex justify-end space-x-3">
+                                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            data-hs-overlay="#addTopicModal">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                                            Create Topic
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -210,7 +248,7 @@
                             @endforeach
                         </div>
                     @endif
-<<<<<<< Updated upstream
+
 
                     <!-- Edit Topic Modal -->
                     <div id="editTopicModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
@@ -249,8 +287,8 @@
                                     
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                                        <div id="edit_editor" class="ckeditor-classic"></div>
                                         <textarea id="edit_content" name="content" class="hidden"></textarea>
-                                        <div id="editor-holder" class="border rounded-lg overflow-hidden dark:border-gray-600 min-h-[300px]"></div>
                                     </div>
                                     
                                     <div class="flex justify-end space-x-3">
@@ -266,65 +304,65 @@
                             </div>
                         </div>
                     </div>
-=======
->>>>>>> Stashed changes
+
                 </div>
             </div>
         </div>
     </div>
 
-<<<<<<< Updated upstream
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-=======
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> parent of c90dbe7 (done major functionalities)
-    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            CKEDITOR.replace('content');
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Stashed changes
+
     <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
->>>>>>> Stashed changes
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize CKEditor for add form
-            CKEDITOR.replace('editor', {
-                height: 400,
-                toolbar: [
-                    { name: 'document', items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
-                    { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
-                    { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
-                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
-                    { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
-                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
-                    '/',
-                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
-                    { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
-                ],
-                contentsCss: [
-                    'body { font-family: "Inter", sans-serif; font-size: 14px; }',
-                    'body.dark { background: #1e293b; color: white; }'
-                ]
-            });
+            // Initialize CKEditor 5 for add form
+            let addEditor;
+            ClassicEditor
+                .create(document.querySelector('#editor'), {
+                    // CKEditor 5 configuration
+                    toolbar: {
+                        items: [
+                            'heading', '|',
+                            'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', '|',
+                            'bulletedList', 'numberedList', '|',
+                            'outdent', 'indent', '|',
+                            'alignment', '|',
+                            'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|',
+                            'undo', 'redo', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    language: 'en',
+                    licenseKey: '',
+                })
+                .then(editor => {
+                    addEditor = editor;
+                    // Update the hidden textarea when editor content changes
+                    editor.model.document.on('change:data', () => {
+                        document.getElementById('content').value = editor.getData();
+                    });
+                    
+                    // Also update on form submission as a fallback
+                    document.querySelector('#addTopicModal form').addEventListener('submit', function(e) {
+                        document.getElementById('content').value = editor.getData();
+                        return true;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error initializing CKEditor:', error);
+                });
 
             // Edit Topic Modal Handling
-            let editEditor = null;
+            let editEditor;
 
             // Handle edit button clicks
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     // Destroy previous editor instance if exists
                     if (editEditor) {
-                        editEditor.destroy();
-                        editEditor = null;
+                        editEditor.destroy().catch(error => {
+                            console.error('Error destroying editor:', error);
+                        });
                     }
                     
                     // Get topic data from data attributes
@@ -343,56 +381,61 @@
                     document.getElementById('edit_topic_desc').value = topicDesc;
                     document.getElementById('edit_video_url').value = videoUrl;
                     
-                    // Initialize CKEditor for the edit form
-                    editEditor = CKEDITOR.replace('editor-holder', {
-                        height: 400,
-                        toolbar: [
-                            { name: 'document', items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
-                            { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
-                            { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
-                            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
-                            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
-                            { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                            { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
-                            '/',
-                            { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                            { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
-                            { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
-                        ],
-                        contentsCss: [
-                            'body { font-family: "Inter", sans-serif; font-size: 14px; }',
-                            'body.dark { background: #1e293b; color: white; }'
-                        ]
-                    });
-                    
-                    // Set the content in CKEditor after initialization
-                    editEditor.on('instanceReady', function() {
-                        this.setData(content);
-                    });
-                    
-                    // Update the hidden textarea before form submission
-                    document.getElementById('editTopicForm').addEventListener('submit', function() {
-                        document.getElementById('edit_content').value = editEditor.getData();
-                    });
+                    // Initialize CKEditor 5 for the edit form
+                    ClassicEditor
+                        .create(document.querySelector('#edit_editor'), {
+                            // CKEditor 5 configuration
+                            toolbar: {
+                                items: [
+                                    'heading', '|',
+                                    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', '|',
+                                    'bulletedList', 'numberedList', '|',
+                                    'outdent', 'indent', '|',
+                                    'alignment', '|',
+                                    'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|',
+                                    'undo', 'redo', '|',
+                                    'sourceEditing'
+                                ],
+                                shouldNotGroupWhenFull: true
+                            },
+                            language: 'en',
+                            licenseKey: '',
+                        })
+                        .then(editor => {
+                            editEditor = editor;
+                            // Set the content in CKEditor
+                            editor.setData(content);
+                            
+                            // Update the hidden textarea when editor content changes
+                            editor.model.document.on('change:data', () => {
+                                document.getElementById('edit_content').value = editor.getData();
+                            });
+                            
+                            // Also update on form submission as a fallback
+                            document.getElementById('editTopicForm').addEventListener('submit', function(e) {
+                                document.getElementById('edit_content').value = editor.getData();
+                                return true;
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error initializing CKEditor:', error);
+                        });
                 });
             });
             
             // Clean up when modal is closed
             document.getElementById('closeEditModal').addEventListener('click', function() {
                 if (editEditor) {
-                    editEditor.destroy();
+                    editEditor.destroy().catch(error => {
+                        console.error('Error destroying editor:', error);
+                    });
                     editEditor = null;
                 }
                 // Reset form
                 document.getElementById('editTopicForm').reset();
                 document.getElementById('editTopicForm').action = '';
             });
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> parent of c90dbe7 (done major functionalities)
->>>>>>> Stashed changes
+
         });
     </script>
 </x-app-layout>

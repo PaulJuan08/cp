@@ -266,6 +266,7 @@
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course Name</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th> -->
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white dark:bg-neutral-900 divide-y divide-gray-200 dark:divide-neutral-700">
@@ -304,6 +305,22 @@
                                                         {{ $course->progress == 100 ? 'Completed' : ($course->progress > 0 ? 'In Progress' : 'Not Started') }}
                                                     </span>
                                                 </td>
+                                                <!-- <td class="px-6 py-4 whitespace-nowrap">
+                                                    @if($course['can_print'])
+                                                        <a href="{{ route('admin.users.certificate.print', [
+                                                            'encryptedUser' => Crypt::encrypt($user->id),
+                                                            'encryptedCourse' => Crypt::encrypt($course['course']->id)
+                                                        ]) }}" 
+                                                        class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                            </svg>
+                                                            Print Certificate
+                                                        </a>
+                                                    @else
+                                                        <span class="text-gray-500 dark:text-gray-400 text-sm">Complete course to unlock</span>
+                                                    @endif
+                                                </td> -->
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -311,6 +328,46 @@
                             </div>
                             <div class="bg-gray-50 dark:bg-neutral-800 px-6 py-3 border-t border-gray-200 dark:border-neutral-700">
                                 <a href="#" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">View all courses</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Modal -->
+                    <div id="certificate-modal" class="hs-overlay hidden size-full fixed top-0 left-0 z-[60] overflow-x-hidden overflow-y-auto">
+                        <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+                            <!-- Backdrop -->
+                            <div class="fixed inset-0 bg-gray-900/50 dark:bg-neutral-950/50"></div>
+                            
+                            <!-- Modal Content -->
+                            <div class="flex items-center justify-center min-h-screen">
+                                <div class="relative bg-white dark:bg-neutral-800 rounded-xl shadow-xl w-full max-h-[90vh] overflow-hidden border dark:border-neutral-700">
+                                    <!-- Modal Header -->
+                                    <div class="p-4 border-b dark:border-neutral-700 flex justify-between items-center">
+                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                            Certificate Status
+                                        </h3>
+                                        <button type="button" 
+                                                onclick="checkCertificateStatus({{ $course->id }}, {{ $course->progress }})"
+                                                class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                            </svg>
+                                            Print Certificate
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Modal Body -->
+                                    <div class="p-4 overflow-y-auto max-h-[60vh]">
+                                        <div id="certificate-message" class="text-gray-700 dark:text-neutral-300 space-y-4">
+                                            <!-- Message will be inserted here -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="p-4 border-t dark:border-neutral-700 flex justify-end">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#certificate-modal">Close</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -556,5 +613,66 @@
             document.getElementById(tabName + '-tab').classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300');
             document.getElementById(tabName + '-tab').classList.add('text-blue-600', 'border-blue-500', 'dark:text-blue-400', 'dark:border-blue-400');
         }
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.print-certificate').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const button = this;
+                const originalText = button.innerHTML;
+                
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                
+                try {
+                    const response = await fetch(button.href, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `certificate-${button.dataset.courseId}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message);
+                    }
+                } catch (error) {
+                    // Show error in modal instead of alert
+                    const modal = document.getElementById('certificate-modal');
+                    const messageDiv = document.getElementById('certificate-message');
+                    
+                    messageDiv.innerHTML = `
+                        <div class="text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mt-2">Certificate Error</h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                ${error.message}
+                            </p>
+                        </div>
+                    `;
+                    
+                    const modalInstance = HSOverlay.getInstance(modal);
+                    modalInstance.open();
+                } finally {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            });
+        });
+    });
     </script>
 </x-app-layout>

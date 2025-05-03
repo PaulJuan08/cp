@@ -75,14 +75,14 @@
                                         {{ $completedTopics }} of {{ $totalTopics }} topics completed
                                     </span>
                                     
-                                    <a href="{{ route('users.courses.show', $course->id) }}" 
+                                    <!-- <a href="{{ route('users.courses.show', $course->id) }}" 
                                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
                                         @if($progressPercent == 100)
                                             Review Course
                                         @else
                                             Continue Learning
                                         @endif
-                                    </a>
+                                    </a> -->
                                 </div>
                             </div>
                         @endforeach

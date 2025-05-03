@@ -39,35 +39,36 @@
     -translate-x-full transition-all duration-300 transform h-full hidden fixed top-0 start-0 bottom-0 z-60
     bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700" role="dialog" tabindex="-1" aria-label="Sidebar">
     <div class="relative flex flex-col h-full max-h-full">
-<<<<<<< Updated upstream
+
       <!-- Header -->
       <header class="p-4 flex justify-between items-center gap-x-2">
-        <a class="flex-none font-semibold text-xl text-black focus:outline-hidden focus:opacity-80 dark:text-white" href="#" aria-label="Brand">CoursePriva</a>
+      <div class="flex items-center gap-0">  <!-- Changed from gap-3 to gap-2 -->
+        <img src="{{ asset('assets/img/shield.png') }}" 
+            alt="CoursePriva Logo" 
+            class="h-14 w-auto">
+        
+        <a class="flex-none font-semibold text-xl text-black focus:outline-hidden focus:opacity-80 dark:text-white" 
+          href="#" 
+          aria-label="Brand">
+          CoursePriva
+        </a>
+      </div>
 
         <div class="lg:hidden -me-2">
           <!-- Close Button -->
-          <button type="button" class="flex justify-center items-center gap-x-3 size-6 bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200" data-hs-overlay="#hs-application-sidebar">
-            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <button type="button" class="flex justify-center items-center gap-x-3 size-6 bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200" 
+                  data-hs-overlay="#hs-application-sidebar">
+            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"/>
+              <path d="m6 6 12 12"/>
+            </svg>
             <span class="sr-only">Close</span>
           </button>
           <!-- End Close Button -->
         </div>
       </header>
       <!-- End Header -->
-=======
-      <div class="px-6 pt-4 flex items-center">
-        <!-- Logo -->
-        <a class="flex-none rounded-xl text-xl inline-block font-semibold focus:outline-hidden focus:opacity-80" href="#" aria-label="Preline">
-          <svg class="w-28 h-auto" width="116" height="32" viewBox="0 0 116 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M33.5696 30.8182V11.3182H37.4474V13.7003H37.6229C37.7952 13.3187 38.0445 12.9309 38.3707 12.5369C38.7031 12.1368 39.134 11.8045 39.6634 11.5398C40.1989 11.2689 40.8636 11.1335 41.6577 11.1335C42.6918 11.1335 43.6458 11.4044 44.5199 11.946C45.3939 12.4815 46.0926 13.291 46.6158 14.3743C47.139 15.4515 47.4006 16.8026 47.4006 18.4276C47.4006 20.0095 47.1451 21.3452 46.6342 22.4347C46.1295 23.518 45.4401 24.3397 44.5661 24.8999C43.6982 25.4538 42.7256 25.7308 41.6484 25.7308C40.8852 25.7308 40.2358 25.6046 39.7003 25.3523C39.1709 25.0999 38.737 24.7829 38.3984 24.4013C38.0599 24.0135 37.8014 23.6226 37.6229 23.2287H37.5028V30.8182H33.5696ZM37.4197 18.4091C37.4197 19.2524 37.5367 19.9879 37.7706 20.6158C38.0045 21.2436 38.343 21.733 38.7862 22.0838C39.2294 22.4285 39.768 22.6009 40.402 22.6009C41.0421 22.6009 41.5838 22.4254 42.027 22.0746C42.4702 21.7176 42.8056 21.2251 43.0334 20.5973C43.2673 19.9633 43.3842 19.2339 43.3842 18.4091C43.3842 17.5904 43.2704 16.8703 43.0426 16.2486C42.8149 15.6269 42.4794 15.1406 42.0362 14.7898C41.593 14.4389 41.0483 14.2635 40.402 14.2635C39.7618 14.2635 39.2202 14.4328 38.777 14.7713C38.34 15.1098 38.0045 15.59 37.7706 16.2116C37.5367 16.8333 37.4197 17.5658 37.4197 18.4091ZM49.2427 25.5V11.3182H53.0559V13.7926H53.2037C53.4622 12.9124 53.8961 12.2476 54.5055 11.7983C55.1149 11.3428 55.8166 11.1151 56.6106 11.1151C56.8076 11.1151 57.02 11.1274 57.2477 11.152C57.4754 11.1766 57.6755 11.2105 57.8478 11.2536V14.7436C57.6632 14.6882 57.4077 14.639 57.0815 14.5959C56.7553 14.5528 56.4567 14.5312 56.1859 14.5312C55.6073 14.5312 55.0903 14.6574 54.6348 14.9098C54.1854 15.156 53.8284 15.5007 53.5638 15.9439C53.3052 16.3871 53.176 16.898 53.176 17.4766V25.5H49.2427ZM64.9043 25.777C63.4455 25.777 62.1898 25.4815 61.1373 24.8906C60.0909 24.2936 59.2845 23.4503 58.7182 22.3608C58.1519 21.2652 57.8688 19.9695 57.8688 18.4737C57.8688 17.0149 58.1519 15.7346 58.7182 14.6328C59.2845 13.531 60.0816 12.6723 61.1096 12.0568C62.1437 11.4413 63.3563 11.1335 64.7474 11.1335C65.683 11.1335 66.5539 11.2843 67.3603 11.5859C68.1728 11.8814 68.8806 12.3277 69.4839 12.9247C70.0932 13.5218 70.5672 14.2727 70.9057 15.1776C71.2443 16.0762 71.4135 17.1288 71.4135 18.3352V19.4155H59.4384V16.978H67.7111C67.7111 16.4117 67.588 15.91 67.3418 15.473C67.0956 15.036 66.754 14.6944 66.317 14.4482C65.8861 14.1958 65.3844 14.0696 64.812 14.0696C64.2149 14.0696 63.6856 14.2081 63.2239 14.4851C62.7684 14.7559 62.4114 15.1222 62.1529 15.5838C61.8944 16.0393 61.762 16.5471 61.7559 17.1072V19.4247C61.7559 20.1264 61.8851 20.7327 62.1437 21.2436C62.4083 21.7545 62.7807 22.1484 63.2608 22.4254C63.741 22.7024 64.3103 22.8409 64.9689 22.8409C65.406 22.8409 65.8061 22.7794 66.1692 22.6562C66.5324 22.5331 66.8432 22.3485 67.1018 22.1023C67.3603 21.8561 67.5572 21.5545 67.6927 21.1974L71.3304 21.4375C71.1458 22.3116 70.7672 23.0748 70.1948 23.7273C69.6285 24.3736 68.896 24.8783 67.9974 25.2415C67.1048 25.5985 66.0738 25.777 64.9043 25.777ZM77.1335 6.59091V25.5H73.2003V6.59091H77.1335ZM79.5043 25.5V11.3182H83.4375V25.5H79.5043ZM81.4801 9.49006C80.8954 9.49006 80.3937 9.29616 79.9752 8.90838C79.5628 8.51444 79.3566 8.04356 79.3566 7.49574C79.3566 6.95407 79.5628 6.48935 79.9752 6.10156C80.3937 5.70762 80.8954 5.51065 81.4801 5.51065C82.0649 5.51065 82.5635 5.70762 82.9759 6.10156C83.3944 6.48935 83.6037 6.95407 83.6037 7.49574C83.6037 8.04356 83.3944 8.51444 82.9759 8.90838C82.5635 9.29616 82.0649 9.49006 81.4801 9.49006ZM89.7415 17.3011V25.5H85.8083V11.3182H89.5569V13.8203H89.723C90.037 12.9955 90.5632 12.343 91.3019 11.8629C92.0405 11.3767 92.9361 11.1335 93.9887 11.1335C94.9735 11.1335 95.8322 11.349 96.5647 11.7798C97.2971 12.2107 97.8665 12.8262 98.2728 13.6264C98.679 14.4205 98.8821 15.3684 98.8821 16.4702V25.5H94.9489V17.1719C94.9551 16.304 94.7335 15.6269 94.2841 15.1406C93.8348 14.6482 93.2162 14.402 92.4283 14.402C91.8989 14.402 91.4311 14.5159 91.0249 14.7436C90.6248 14.9714 90.3109 15.3037 90.0831 15.7408C89.8615 16.1716 89.7477 16.6918 89.7415 17.3011ZM107.665 25.777C106.206 25.777 104.951 25.4815 103.898 24.8906C102.852 24.2936 102.045 23.4503 101.479 22.3608C100.913 21.2652 100.63 19.9695 100.63 18.4737C100.63 17.0149 100.913 15.7346 101.479 14.6328C102.045 13.531 102.842 12.6723 103.87 12.0568C104.905 11.4413 106.117 11.1335 107.508 11.1335C108.444 11.1335 109.315 11.2843 110.121 11.5859C110.934 11.8814 111.641 12.3277 112.245 12.9247C112.854 13.5218 113.328 14.2727 113.667 15.1776C114.005 16.0762 114.174 17.1288 114.174 18.3352V19.4155H102.199V16.978H110.472C110.472 16.4117 110.349 15.91 110.103 15.473C109.856 15.036 109.515 14.6944 109.078 14.4482C108.647 14.1958 108.145 14.0696 107.573 14.0696C106.976 14.0696 106.446 14.2081 105.985 14.4851C105.529 14.7559 105.172 15.1222 104.914 15.5838C104.655 16.0393 104.523 16.5471 104.517 17.1072V19.4247C104.517 20.1264 104.646 20.7327 104.905 21.2436C105.169 21.7545 105.542 22.1484 106.022 22.4254C106.502 22.7024 107.071 22.8409 107.73 22.8409C108.167 22.8409 108.567 22.7794 108.93 22.6562C109.293 22.5331 109.604 22.3485 109.863 22.1023C110.121 21.8561 110.318 21.5545 110.454 21.1974L114.091 21.4375C113.907 22.3116 113.528 23.0748 112.956 23.7273C112.389 24.3736 111.657 24.8783 110.758 25.2415C109.866 25.5985 108.835 25.777 107.665 25.777Z" class="fill-blue-600 dark:fill-white" fill="currentColor" />
-            <path d="M1 29.5V16.5C1 9.87258 6.37258 4.5 13 4.5C19.6274 4.5 25 9.87258 25 16.5C25 23.1274 19.6274 28.5 13 28.5H12" class="stroke-blue-600 dark:stroke-white" stroke="currentColor" stroke-width="2" />
-            <path d="M5 29.5V16.66C5 12.1534 8.58172 8.5 13 8.5C17.4183 8.5 21 12.1534 21 16.66C21 21.1666 17.4183 24.82 13 24.82H12" class="stroke-blue-600 dark:stroke-white" stroke="currentColor" stroke-width="2" />
-            <circle cx="13" cy="16.5214" r="5" class="fill-blue-600 dark:fill-white" fill="currentColor" />
-          </svg>
-        </a>
-        <!-- End Logo -->
-      </div>
->>>>>>> Stashed changes
+
 
       <!-- Content -->
       <div class="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
@@ -111,27 +112,64 @@
                 Topics
               </a>
             </li>
+
+            <li>
+              <a class="w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200" href="{{route('admin.utilities.index')}}">
+                <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <line x1="10" x2="8" y1="9" y2="9"/>
+                </svg>
+                Legal Policies
+              </a>
+            </li>
+
           </ul>
         </nav>
       </div>
       <!-- End Content -->
     </div>
   </div>
-<<<<<<< Updated upstream
+
   <!-- End Sidebar -->
 
 
-  <!-- ========== FOOTER ========== -->
-  <footer class="fixed bottom-0 left-0 right-0 bg-black dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700 p-2 z-50">
+
+<!-- ========== FOOTER ========== -->
+<footer class="fixed bottom-0 left-0 right-0 bg-black dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700 p-2 z-50">
   <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-    <p class="text-white text-right text-sm">
-      <a href="#terms-modal" class="hover:no-underline" data-hs-overlay="#terms-modal">
-        Terms and Conditions
-      </a>
-    </p>
+    @php
+      // Only get published policies
+      $terms = \App\Models\Utility::where('type', 'terms')->where('is_published', true)->first();
+      $privacy = \App\Models\Utility::where('type', 'privacy')->where('is_published', true)->first();
+      $cookies = \App\Models\Utility::where('type', 'cookies')->where('is_published', true)->first();
+      $hasPolicies = $terms || $privacy || $cookies;
+    @endphp
+
+    @if($hasPolicies)
+      <p class="text-white text-right text-sm space-x-4">
+        @if($terms)
+          <a href="#terms-modal" class="hover:underline" data-hs-overlay="#terms-modal">
+            Terms and Conditions
+          </a>
+        @endif
+        @if($privacy)
+          <a href="#privacy-modal" class="hover:underline" data-hs-overlay="#privacy-modal">
+            Privacy Policy
+          </a>
+        @endif
+        @if($cookies)
+          <a href="#cookies-modal" class="hover:underline" data-hs-overlay="#cookies-modal">
+            Cookies 
+          </a>
+        @endif
+      </p>
+    @endif
   </div>
 
-  <!-- Terms and Conditions Modal - NEW VERSION -->
+  <!-- Terms and Conditions Modal -->
   <div class="fixed inset-0 z-[9999] hidden" id="terms-modal">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-gray-900/50 dark:bg-neutral-950/50" data-hs-overlay="#terms-modal"></div>
@@ -143,7 +181,7 @@
         <!-- Modal Header -->
         <div class="p-4 border-b dark:border-neutral-700 flex justify-between items-center">
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-            CoursePriva Terms and Conditions
+            {{ $terms->title ?? 'Terms and Conditions' }}
           </h3>
           <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#terms-modal">
             <span class="sr-only">Close</span>
@@ -157,108 +195,11 @@
         <!-- Modal Body -->
         <div class="p-4 overflow-y-auto max-h-[60vh]">
           <div class="text-gray-700 dark:text-neutral-300 space-y-4">
-            <h4 class="font-normal"><span class="font-semibold">Effective Date:</span> {{ date('F j, Y') }}</h4>
-            <p>Welcome to CoursePriva! These Terms and Conditions govern your access to and use of the CoursePriva Learning 
-              Management System (LMS). By accessing or using CoursePriva, you agree to comply with these terms. 
-              If you do not agree, you must not use the platform.</p>
-            
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">1. Definitions</h4>
-            <p>1.1 "<span class="font-bold">CoursePriva</span>" refers to the Learning Management System provided by Office of Data Privacy, 
-              Central Mindanao University.</p>
-            <p>1.2 "<span class="font-bold">User</span>" refers to any individual accessing or using the platform, including but not limited 
-              to learners, instructors, and administrators.</p>
-            <p>1.3 "<span class="font-bold">Content</span>" includes any materials, such as text, images, videos, or documents, uploaded 
-              or shared on CoursePriva.</p>
-            <p>1.4 "<span class="font-bold">Personal Data</span>" refers to any information that can identify a user, as defined by the 
-              Data Privacy Act of 2012 (RA 10173).</p>  
-
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">2. User Accounts</h4>
-            <p>2.1 <span class="font-bold">Account Creation</span>: Users must provide accurate and complete information during registration.</p>
-            <p>2.2 <span class="font-bold">Account Security</span>: Users are responsible for maintaining the confidentiality of their login credentials and must 
-              notify CoursePriva immediately of unauthorized access.</p>
-            <p>2.3 <span class="font-bold">Account Termination</span>: CoursePriva reserves the right to suspend or terminate accounts that violate these terms.</p>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">3. Acceptable Use</h4>
-            <p>3.1 Users agree to use CoursePriva for lawful purposes and in compliance with all applicable laws, including RA 10173.</p>
-            <p>3.2 Prohibited activities include:</p>
-            <ul class="list-disc pl-5 space-y-1">
-              <li>Uploading or sharing harmful, defamatory, or illegal content.</li>
-              <li>Engaging in unauthorized data collection or data scraping.</li>
-              <li>Attempting to disrupt or compromise the platform’s security.</li>
-            </ul>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-            
-            <h4 class="font-semibold">4. Content Ownership and Usage</h4>
-            <p>4.1 Users retain ownership of the content they upload to the platform.</p>
-            <p>4.2 By uploading content, users grant CoursePriva a non-exclusive license to use 
-              the material for educational purposes within the platform.</p>
-            <p>4.3 Users must ensure that any content uploaded complies with copyright laws and does not infringe on third-party rights.</p>
-            
-            
-            <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">5. Privacy and Data Protection</h4>
-            <p>5.1 CoursePriva is committed to protecting users’ personal data in compliance with RA 10173 (Data Privacy Act of 2012).</p>
-            <p>5.2 <span class="font-bold">Data Collection</span>: CoursePriva collects only necessary personal data for account creation 
-              and platform functionality.</p>
-            <p>5.3 <span class="font-bold">Data Use</span>: Personal data will not be shared with third parties without user consent unless required by law.
-              and platform functionality.</p>  
-            <p>5.4 <span class="font-bold">User Rights</span>: Users may access, update, or request the deletion of their personal data by contacting our support team at dpo@cmu.edu.ph.</p>  
-          
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">6. Intellectual Property</h4>
-            <p>6.1 The CoursePriva platform and its design, software, and branding are the intellectual property of Office of Data Privacy, Central Mindanao University.</p>
-            <p>6.2 Users may not reproduce, distribute, or modify CoursePriva’s proprietary materials without prior written consent.</p>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">7. Limitation of Liability</h4>
-            <p>7.1 CoursePriva provides the platform "as-is" and does not guarantee uninterrupted or error-free access.</p>
-            <p>7.2 CoursePriva shall not be liable for indirect, incidental, or consequential damages arising from platform use, including data loss or system downtime.</p>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">8. Modifications to Terms</h4>
-            <p>8.1 CoursePriva reserves the right to update these Terms and Conditions. Users will be notified of changes through the platform or email. Continued use of 
-              CoursePriva constitutes acceptance of updated terms.</p>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">9. Governing Law</h4>
-            <p>9.1 These Terms and Conditions are governed by the laws of the Republic of the Philippines, including RA 10173 (Data Privacy Act of 2012).</p>
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">10. Contact Information</h4>
-            <p>For questions or concerns regarding these terms, please contact us at:</p>
-            <p><span class="font-bold">Email</span>: dpo@cmu.edu.ph</p>
-            <p><span class="font-bold">Address</span>: Office of Data Privacy, Central Mindanao University, University Town, Musuan, Maramag, Bukidnon, Philippines.</p>  
-
-              <!-- Horizontal separator line -->
-            <div class="border-t border-gray-300 my-4"></div>
-
-            <h4 class="font-semibold">Acknowledgment</h4>
-            <p>By using CoursePriva, you acknowledge that you have read, understood, and agreed to these Terms and Conditions.</p>
-
+            @if($terms)
+              {!! $terms->content !!}
+            @else
+              <p>No terms and conditions available.</p>
+            @endif
           </div>
         </div>
         
@@ -270,50 +211,216 @@
       </div>
     </div>
   </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="fixed inset-0 z-[9999] hidden" id="privacy-modal">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-gray-900/50 dark:bg-neutral-950/50" data-hs-overlay="#privacy-modal"></div>
+    
+    <!-- Modal Container -->
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+      <!-- Modal Content -->
+      <div class="relative bg-white dark:bg-neutral-800 rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden border dark:border-neutral-700">
+        <!-- Modal Header -->
+        <div class="p-4 border-b dark:border-neutral-700 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+            {{ $privacy->title ?? 'Privacy Policy' }}
+          </h3>
+          <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#privacy-modal">
+            <span class="sr-only">Close</span>
+            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"/>
+              <path d="m6 6 12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div class="text-gray-700 dark:text-neutral-300 space-y-4">
+            @if($privacy)
+              {!! $privacy->content !!}
+            @else
+              <p>No privacy policy available.</p>
+            @endif
+          </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#privacy-modal">Close</button>
+          <button type="button" class="btn btn-sm btn-primary" id="accept-privacy" data-hs-overlay="#privacy-modal">Accept</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookies Policy Modal -->
+  <div class="fixed inset-0 z-[9999] hidden" id="cookies-modal">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-gray-900/50 dark:bg-neutral-950/50" data-hs-overlay="#cookies-modal"></div>
+    
+    <!-- Modal Container -->
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+      <!-- Modal Content -->
+      <div class="relative bg-white dark:bg-neutral-800 rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden border dark:border-neutral-700">
+        <!-- Modal Header -->
+        <div class="p-4 border-b dark:border-neutral-700 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+            {{ $cookies->title ?? 'Cookies Policy' }}
+          </h3>
+          <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#cookies-modal">
+            <span class="sr-only">Close</span>
+            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"/>
+              <path d="m6 6 12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div class="text-gray-700 dark:text-neutral-300 space-y-4">
+            @if($cookies)
+              {!! $cookies->content !!}
+            @else
+              <p>No cookies policy available.</p>
+            @endif
+          </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#cookies-modal">Close</button>
+          <button type="button" class="btn btn-sm btn-primary" id="accept-cookies" data-hs-overlay="#cookies-modal">Accept</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Simple modal toggle functionality
-  const modal = document.getElementById('terms-modal');
-  const openButtons = document.querySelectorAll('[data-hs-overlay="#terms-modal"]');
-  const acceptButton = document.getElementById('accept-terms');
-  
-  function toggleModal(show) {
-    modal.classList.toggle('hidden', !show);
-    document.body.style.overflow = show ? 'hidden' : '';
+
+  // Cookie management functions
+  function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Lax";
   }
-  
-  // Open modal automatically
-  if (!localStorage.getItem('termsAccepted')) {
-    setTimeout(() => toggleModal(true), 500);
+
+  function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+    }
+    return null;
   }
-  
-  // Set up click handlers
-  openButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      toggleModal(true);
+
+  function checkPolicyAccepted(policyName) {
+    return getCookie(policyName + '_accepted') === 'true';
+  }
+
+  function acceptPolicy(policyName) {
+    setCookie(policyName + '_accepted', 'true', 365);
+  }
+
+  // Initialize modals
+  const termsModal = document.getElementById('terms-modal');
+  const privacyModal = document.getElementById('privacy-modal');
+  const cookiesModal = document.getElementById('cookies-modal');
+
+  // Show modals in sequence if they exist and haven't been accepted
+  function showNextModal() {
+    if (termsModal && !checkPolicyAccepted('terms')) {
+      termsModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // When terms modal closes, show privacy modal if needed
+      termsModal.addEventListener('hs-overlay-hidden', () => {
+        if (privacyModal && !checkPolicyAccepted('privacy')) {
+          setTimeout(() => {
+            privacyModal.classList.remove('hidden');
+          }, 300);
+        }
+      });
+    } 
+    else if (privacyModal && !checkPolicyAccepted('privacy')) {
+      privacyModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // When privacy modal closes, show cookies modal if needed
+      privacyModal.addEventListener('hs-overlay-hidden', () => {
+        if (cookiesModal && !checkPolicyAccepted('cookies')) {
+          setTimeout(() => {
+            cookiesModal.classList.remove('hidden');
+          }, 300);
+        }
+      });
+    }
+    else if (cookiesModal && !checkPolicyAccepted('cookies')) {
+      cookiesModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Only show modals if not all policies are accepted
+  if (!checkPolicyAccepted('terms') || !checkPolicyAccepted('privacy') || !checkPolicyAccepted('cookies')) {
+    setTimeout(showNextModal, 1000);
+  }
+
+  // Handle acceptance buttons
+  document.getElementById('accept-terms')?.addEventListener('click', function() {
+    acceptPolicy('terms');
+    termsModal.classList.add('hidden');
+    document.body.style.overflow = '';
+    if (privacyModal && !checkPolicyAccepted('privacy')) {
+      setTimeout(() => {
+        privacyModal.classList.remove('hidden');
+      }, 300);
+    }
+  });
+
+  document.getElementById('accept-privacy')?.addEventListener('click', function() {
+    acceptPolicy('privacy');
+    privacyModal.classList.add('hidden');
+    document.body.style.overflow = '';
+    if (cookiesModal && !checkPolicyAccepted('cookies')) {
+      setTimeout(() => {
+        cookiesModal.classList.remove('hidden');
+      }, 300);
+    }
+  });
+
+  document.getElementById('accept-cookies')?.addEventListener('click', function() {
+    acceptPolicy('cookies');
+    cookiesModal.classList.add('hidden');
+    document.body.style.overflow = '';
+  });
+
+  // Initialize modal close handlers for manual viewing
+  document.querySelectorAll('[data-hs-overlay^="#"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      if (this.getAttribute('href')?.startsWith('#')) {
+        e.preventDefault();
+        const modalId = this.getAttribute('data-hs-overlay');
+        const modal = document.querySelector(modalId);
+        if (modal) {
+          modal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        }
+      }
     });
   });
-  
-  // Close handlers
-  modal.querySelectorAll('[data-hs-overlay="#terms-modal"]').forEach(btn => {
-    btn.addEventListener('click', () => toggleModal(false));
-  });
-  
-  // Accept handler
-  if (acceptButton) {
-    acceptButton.addEventListener('click', function() {
-      localStorage.setItem('termsAccepted', 'true');
-      toggleModal(false);
-    });
+
+  // Initialize Preline components
+  if (window.HSOverlay) {
+    HSOverlay.autoInit();
   }
-  
-  // Close when clicking on backdrop
-  modal.querySelector('.bg-gray-900/50').addEventListener('click', () => toggleModal(false));
 });
 </script>
-=======
-  <!-- End Sidebar -->
->>>>>>> Stashed changes
+
