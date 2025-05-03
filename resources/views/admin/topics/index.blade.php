@@ -28,6 +28,7 @@
                                 </button>
                             </div>
                             <div class="max-h-[80vh] overflow-y-auto">
+<<<<<<< Updated upstream
                             <form action="{{ route('admin.topics.store') }}" method="POST" >
                                 @csrf
                                 <div class="mb-3">
@@ -91,6 +92,46 @@
                                 <div class="mt-4">
                                     <iframe width="100%" height="315" id="modalVideo" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 </div>
+=======
+                                <form action="{{ route('admin.topics.store') }}" method="POST">
+                                    @csrf
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label for="topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                                            <input type="text" id="topic_name" name="topic_name" required
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                        <div>
+                                            <label for="video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
+                                            <input type="url" name="video_url" 
+                                                placeholder="https://www.youtube.com/watch?v=..."
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                        <textarea id="topic_desc" name="topic_desc" rows="3" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                                        <div id="editor" class="ckeditor-classic"></div>
+                                        <textarea id="content" name="content" class="hidden">{{ old('content') }}</textarea>
+                                    </div>
+                                    
+                                    <div class="flex justify-end space-x-3">
+                                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            data-hs-overlay="#addTopicModal">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                                            Create Topic
+                                        </button>
+                                    </div>
+                                </form>
+>>>>>>> Stashed changes
                             </div>
                         </div>
                     </div>
@@ -153,15 +194,200 @@
                             @endforeach
                         </div>
                     @endif
+<<<<<<< Updated upstream
+=======
+
+                    <!-- Edit Topic Modal -->
+                    <div id="editTopicModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Topic</h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    data-hs-overlay="#editTopicModal" id="closeEditModal">
+                                    ✕
+                                </button>
+                            </div>
+                            <div class="max-h-[80vh] overflow-y-auto">
+                                <form id="editTopicForm" method="POST" action="">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" id="edit_topic_id" name="topic_id">
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label for="edit_topic_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Name</label>
+                                            <input type="text" id="edit_topic_name" name="topic_name" required
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                        <div>
+                                            <label for="edit_video_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">YouTube Video URL</label>
+                                            <input type="url" id="edit_video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
+                                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="edit_topic_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Topic Description</label>
+                                        <textarea id="edit_topic_desc" name="topic_desc" rows="3" required
+                                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+                                        <div id="edit_editor" class="ckeditor-classic"></div>
+                                        <textarea id="edit_content" name="content" class="hidden"></textarea>
+                                    </div>
+                                    
+                                    <div class="flex justify-end space-x-3">
+                                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            data-hs-overlay="#editTopicModal">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                                            Update Topic
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+>>>>>>> Stashed changes
                 </div>
             </div>
         </div>
     </div>
 
+<<<<<<< Updated upstream
     <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             CKEDITOR.replace('content');
+=======
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize CKEditor 5 for add form
+            let addEditor;
+            ClassicEditor
+                .create(document.querySelector('#editor'), {
+                    // CKEditor 5 configuration
+                    toolbar: {
+                        items: [
+                            'heading', '|',
+                            'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', '|',
+                            'bulletedList', 'numberedList', '|',
+                            'outdent', 'indent', '|',
+                            'alignment', '|',
+                            'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|',
+                            'undo', 'redo', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    language: 'en',
+                    licenseKey: '',
+                })
+                .then(editor => {
+                    addEditor = editor;
+                    // Update the hidden textarea when editor content changes
+                    editor.model.document.on('change:data', () => {
+                        document.getElementById('content').value = editor.getData();
+                    });
+                    
+                    // Also update on form submission as a fallback
+                    document.querySelector('#addTopicModal form').addEventListener('submit', function(e) {
+                        document.getElementById('content').value = editor.getData();
+                        return true;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error initializing CKEditor:', error);
+                });
+
+            // Edit Topic Modal Handling
+            let editEditor;
+
+            // Handle edit button clicks
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Destroy previous editor instance if exists
+                    if (editEditor) {
+                        editEditor.destroy().catch(error => {
+                            console.error('Error destroying editor:', error);
+                        });
+                    }
+                    
+                    // Get topic data from data attributes
+                    const topicId = this.getAttribute('data-id');
+                    const topicName = this.getAttribute('data-name');
+                    const topicDesc = this.getAttribute('data-desc');
+                    const content = this.getAttribute('data-content');
+                    const videoUrl = this.getAttribute('data-video');
+                    
+                    // Set form action URL with the correct topic ID
+                    document.getElementById('editTopicForm').action = `/admin/topics/${topicId}`;
+                    
+                    // Set form values
+                    document.getElementById('edit_topic_id').value = topicId;
+                    document.getElementById('edit_topic_name').value = topicName;
+                    document.getElementById('edit_topic_desc').value = topicDesc;
+                    document.getElementById('edit_video_url').value = videoUrl;
+                    
+                    // Initialize CKEditor 5 for the edit form
+                    ClassicEditor
+                        .create(document.querySelector('#edit_editor'), {
+                            // CKEditor 5 configuration
+                            toolbar: {
+                                items: [
+                                    'heading', '|',
+                                    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', '|',
+                                    'bulletedList', 'numberedList', '|',
+                                    'outdent', 'indent', '|',
+                                    'alignment', '|',
+                                    'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|',
+                                    'undo', 'redo', '|',
+                                    'sourceEditing'
+                                ],
+                                shouldNotGroupWhenFull: true
+                            },
+                            language: 'en',
+                            licenseKey: '',
+                        })
+                        .then(editor => {
+                            editEditor = editor;
+                            // Set the content in CKEditor
+                            editor.setData(content);
+                            
+                            // Update the hidden textarea when editor content changes
+                            editor.model.document.on('change:data', () => {
+                                document.getElementById('edit_content').value = editor.getData();
+                            });
+                            
+                            // Also update on form submission as a fallback
+                            document.getElementById('editTopicForm').addEventListener('submit', function(e) {
+                                document.getElementById('edit_content').value = editor.getData();
+                                return true;
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error initializing CKEditor:', error);
+                        });
+                });
+            });
+            
+            // Clean up when modal is closed
+            document.getElementById('closeEditModal').addEventListener('click', function() {
+                if (editEditor) {
+                    editEditor.destroy().catch(error => {
+                        console.error('Error destroying editor:', error);
+                    });
+                    editEditor = null;
+                }
+                // Reset form
+                document.getElementById('editTopicForm').reset();
+                document.getElementById('editTopicForm').action = '';
+            });
+>>>>>>> Stashed changes
         });
     </script>
 
