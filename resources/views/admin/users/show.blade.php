@@ -42,13 +42,6 @@
                             </div>
                         </div>
                         <div class="hidden sm:flex space-x-2">
-                            <a href="{{ route('admin.users.edit', Crypt::encrypt($user->id)) }}" 
-                                class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                                Edit User
-                            </a>
                             <button type="button" onclick="openResetModal('{{ Crypt::encrypt($user->id) }}', '{{ $user->name }}')" 
                                 class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,7 +280,7 @@
                                                         </div>
                                                         <div class="ml-4">
                                                             <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $course->course_name }}</div>
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ $course->topics_count }} Topics • {{ $course->quizzes_count }} Quizzes</div>
+                                                            <div class="text-sm text-gray-500 dark:text-gray-400">• {{ $course->topics_count }} Topics</div>
                                                         </div>
                                                     </div>
                                                 </td>

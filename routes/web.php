@@ -156,12 +156,30 @@ use App\Http\Controllers\TopicsController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\UsersCoursesController;
 use App\Http\Controllers\ContentsController; 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 use App\Http\Controllers\UsersContentsController; 
 use App\Http\Controllers\UsersQuizController; 
 use App\Http\Controllers\{
     QuizController,
     QuizQuestionController,
 };
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\UtilityController; 
+use App\Http\Controllers\CertificateController;
+
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> parent of c90dbe7 (done major functionalities)
+>>>>>>> Stashed changes
 
 // Public Routes
 Route::get('/', function () {
@@ -187,12 +205,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Admin Routes
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Admin Dashboard
+<<<<<<< Updated upstream
     Route::get('/dashboard', [AdminController::class, 'index'])
     ->name('dashboard');
+
+    // Terms and Conditions
+    Route::get('/terms', [AdminController::class, 'indexTerms'])->name('index');
+    Route::get('/terms/create', [AdminController::class, 'createTerms'])->name('create');
+    Route::post('/terms', [AdminController::class, 'storeTerms'])->name('store');
+    Route::get('/terms/{id}/edit', [AdminController::class, 'editTerms'])->name('edit');
+    Route::put('/terms/{id}', [AdminController::class, 'updateTerms'])->name('update');
+    Route::post('/terms/{id}/publish', [AdminController::class, 'publishTerms'])->name('publish');
+    Route::delete('/terms/{id}', [AdminController::class, 'destroyTerms'])->name('destroy');
 
     // Reset Password
     Route::post('users/{encryptedUser}/reset-password', [UsersController::class, 'resetPassword'])
         ->name('users.reset-password');
+=======
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+>>>>>>> Stashed changes
 
     // User Management
     Route::get('/users', [UsersController::class, 'index'])

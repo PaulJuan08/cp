@@ -252,6 +252,7 @@
                         : '<span class="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded">Available</span>';
                 }
                 
+
                 // Update action button
                 const actionCell = currentTopicRow.querySelector('td:nth-child(4)');
                 if (actionCell) {
@@ -260,12 +261,10 @@
                             class="text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded">
                                 Review
                            </a>`
-                        : `<a href="{{ route('users.quiz.show', [
-                                'encryptedTopic' => encrypt($topic->id),
-                                'encryptedQuiz' => encrypt(optional($topic->quiz)->id)
-                            ]) }}">Retry Quiz</a>
-
-
+                        : `
+                            <a href="{{ route('users.contents.show', '') }}/${result.topic_id}" 
+                            class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
+                                Take Quiz
                            </a>`;
                 }
                 

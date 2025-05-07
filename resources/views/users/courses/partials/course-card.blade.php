@@ -1,10 +1,10 @@
 <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-col h-full">
     <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
         {{ $course->course_name }}
-        @if($isAssigned)
+        @if($isAssigned ?? false)
             <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Assigned</span>
         @endif
-        @if($isEnrolled)
+        @if($isEnrolled ?? false)
             <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded ml-2">Enrolled</span>
         @endif
     </h3>
@@ -14,24 +14,21 @@
     </p>
     
     <div class="flex space-x-2">
-        <!-- <a href="{{ route('users.courses.show', $course->id) }}" -->
         <a href="{{ route('users.courses.show', encrypt($course->id)) }}" 
            class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             View Details
         </a>
         
-        @if(!$isEnrolled)
-            <!-- <form action="{{ route('users.courses.enroll', $course->id) }}" method="POST"> -->
-            <form action="{{ route('users.courses.enroll', $course->id) }}" method="POST">
+        @if(!($isEnrolled ?? false))
+            <form action="{{ route('users.courses.enroll', encrypt($course->id)) }}" method="POST">
                 @csrf
                 <button type="submit" 
                         class="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                     Enroll
                 </button>
             </form>
-        @elseif(!$isAssigned)
-            <!-- <form action="{{ route('users.courses.unenroll', $course->id) }}" method="POST"> -->
-            <form action="{{ route('users.courses.unenroll', parameters: $course->id) }}" method="POST">
+        @elseif(!($isAssigned ?? false))
+            <form action="{{ route('users.courses.unenroll', encrypt($course->id)) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 

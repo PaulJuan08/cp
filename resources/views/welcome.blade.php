@@ -9,8 +9,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     
-    <!-- Favicon -->
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <!-- logo -->
+    <link rel="icon" href="{{ asset('assets/img/shield.png') }}?v=1" type="image/png" sizes="128x128">
+    
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -21,19 +22,13 @@
             <div class="flex justify-between h-16 items-center">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    <svg class="h-8 w-auto text-indigo-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="currentColor"/>
-                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="white"/>
-                    </svg>
-                    <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">CoursePriva</span>
+                    <img class="h-16 w-auto" src="{{ asset('assets/img/shield.png') }}" alt="CoursePriva Logo">
+                    <span class="ml-0 text-xl font-bold text-gray-900 dark:text-white">CoursePriva</span>
                 </div>
+
                 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <!-- <a href="#" class="text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Features</a>
-                    <a href="#" class="text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Courses</a>
-                    <a href="#" class="text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Pricing</a>
-                    <a href="#" class="text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">About</a> -->
                     
                     @if (Route::has('login'))
                         @auth
@@ -75,9 +70,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
-                        <a href="#" class="px-8 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition duration-300 shadow-lg shadow-gray-500/10 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700">
-                            Contact sales team
-                        </a>
                     </div>
                 </div>
                 
@@ -86,10 +78,6 @@
                     <div class="relative rounded-2xl overflow-hidden shadow-2xl">
                         <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2850&q=80" alt="Learning illustration" class="w-full h-auto">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                        <div class="absolute bottom-6 left-6 right-6 text-white">
-                            <!-- <h3 class="text-xl font-bold">Join 50,000+ learners</h3>
-                            <p class="mt-1 text-sm opacity-90">Start your free trial today</p> -->
-                        </div>
                     </div>
                 </div>
             </div>
@@ -116,9 +104,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                         </svg>
                     </div>
-                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">Expert Instructors</h3>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">New Ideas</h3>
                     <p class="mt-2 text-gray-600 dark:text-gray-400">
-                        Learn from industry professionals with years of experience in their fields.
+                        Learn from todays information and get ahead of the curve.
                     </p>
                 </div>
                 
@@ -154,66 +142,32 @@
     <!-- Footer -->
     <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <!-- Column 1 -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Product</h3>
-                    <ul class="mt-4 space-y-4">
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Features</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Pricing</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Updates</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 2 -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Company</h3>
-                    <ul class="mt-4 space-y-4">
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">About</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Careers</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Press</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 3 -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Resources</h3>
-                    <ul class="mt-4 space-y-4">
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Documentation</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Community</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Webinars</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Support</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 4 -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Legal</h3>
-                    <ul class="mt-4 space-y-4">
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Privacy</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Terms</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Cookie Policy</a></li>
-                        <li><a href="#" class="text-base text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Licenses</a></li>
-                    </ul>
-                </div>
+
+            <!-- Terms and Conditions -->
+            <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    By using this site, you agree to our 
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 underline">
+                        Terms and Conditions
+                    </a>.
+                </p>
             </div>
-            
+
+            <!-- Logo and Copyright -->
             <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center">
-                    <svg class="h-6 w-auto text-indigo-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="currentColor"/>
-                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="white"/>
-                    </svg>
-                    <span class="ml-2 text-lg font-bold text-gray-900 dark:text-white">CoursePriva</span>
+                    <img class="h-8 w-auto" src="{{ asset('assets/img/shield.png') }}" alt="CoursePriva Logo">
+                    <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">CoursePriva</span>
                 </div>
-                <p class="mt-4 md:mt-0 text-sm text-gray-500 dark:text-gray-400">
+
+                <p class="mt-4 md:mt-0 text-sm text-gray-500 dark:text-gray-400 text-center md:text-right">
                     &copy; {{ date('Y') }} CoursePriva. All rights reserved.
                     <span class="block md:inline mt-1 md:mt-0 md:ml-4">Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})</span>
                 </p>
             </div>
+
         </div>
     </footer>
+
 </body>
 </html>
