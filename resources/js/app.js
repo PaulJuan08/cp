@@ -23,3 +23,4 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error initializing CKEditor:', error);
         });
 });
+
