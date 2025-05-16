@@ -7,10 +7,19 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <x-nav-link :href="route(auth()->user()->role_name === 'Admin' ? 'admin.dashboard' : 'users.dashboard')" 
-                            :active="request()->routeIs(auth()->user()->role_name === 'Admin' ? 'admin.dashboard' : 'users.dashboard')">
-                    {{ __('Dashboard') }}
-                </x-nav-link>
+                    <!-- Back Button -->
+                    <div class="flex items-center">
+                        <button 
+                            id="backButton" 
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                            onclick="window.history.back();"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            {{ __('Back') }}
+                        </button>
+                    </div>
                 </div>
             </div>
 

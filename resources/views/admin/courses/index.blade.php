@@ -1,8 +1,9 @@
 <x-app-layout>
-@extends('layouts.admindashboard')
+    @extends('layouts.admindashboard')
 
     <div class="lg:ps-[260px]">
         <div class="min-h-[75rem] p-4 md:p-8">
+
             <div id="scrollspy" class="space-y-10 md:space-y-16">
                 <div id="courses" class="min-h-[25rem] scroll-mt-24">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Courses</h2>
@@ -52,7 +53,8 @@
                             @foreach ($courses as $course)
                                 <!-- Course Card -->
                                 <div class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-gray-900 dark:border-gray-800 p-4">
-                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:underline">
+                                    <!-- <a href="{{ route('admin.courses.show', $course->id) }}" class="no-underline text-blue-500 hover:no-underline"> -->
+                                    <a href="{{ route('admin.courses.show', encrypt($course->id)) }}" class="no-underline text-blue-500 hover:no-underline">
                                         <h3 class="group-hover:text-blue-600 font-semibold text-gray-800 dark:text-gray-200">
                                             {{ $course->course_name }}
                                         </h3>
@@ -60,6 +62,30 @@
                                             {{ $course->course_desc }}
                                         </p>
                                     </a>
+
+                                    <!-- Assigned Roles Badges -->
+                                    @if($course->assignedRoles->isNotEmpty())
+                                        <div class="mt-2 flex flex-wrap gap-1">
+                                            @foreach($course->assignedRoles->unique('role_name') as $role)
+                                                <span class="px-2 py-1 text-xs font-medium 
+                                                    @switch($role->role_name)
+                                                        @case('Faculty') bg-blue-100 text-blue-800 @break
+                                                        @case('Staff') bg-green-100 text-green-800 @break
+                                                        @case('Student') bg-yellow-100 text-yellow-800 @break
+                                                        @default bg-gray-100 text-gray-800
+                                                    @endswitch
+                                                    rounded-full">
+                                                    {{ $role->role_name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="mt-2">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                No roles assigned
+                                            </span>
+                                        </div>
+                                    @endif
 
                                     <!-- Dropdown for Actions -->
                                     <div class="mt-4 flex justify-end">
@@ -71,37 +97,390 @@
 
                                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 divide-y divide-gray-200 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-with-icons">
                                                 <div class="p-1 space-y-0.5">
+                                                    <!-- Assign Role Action -->
+                                                    <button type="button" 
+                                                        class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                        onclick="openAssignModal(
+                                                            '{{ $course->id }}', 
+                                                            '{{ $course->course_name }}', 
+                                                            {{ json_encode($course->assignedRoles->pluck('role_name')->unique()->toArray()) }}
+                                                        )">
+                                                        🎓 Assign Role
+                                                    </button>
+
+                                                    <!-- View Users Who Enrolled this Course -->   
+                                                    <button type="button"
+                                                        class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                        onclick="fetchEnrolledUsers('{{ $course->id }}', '{{ $course->course_name }}')">
+                                                        👥 List of Users Enrolled 
+                                                    </button>
+
                                                     <!-- Edit Action -->
-                                                    <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700" href="{{ route('admin.courses.edit', $course->id) }}">
-                                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                                                        </svg>
-                                                        Edit
-                                                    </a>
+                                                    <button type="button" 
+                                                        class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none dark:text-neutral-400 dark:hover:bg-neutral-700"
+                                                        onclick="openEditModal(
+                                                            '{{ encrypt($course->id) }}', 
+                                                            '{{ $course->course_name }}', 
+                                                            '{{ $course->course_desc }}'
+                                                        )">
+                                                        ✎ Edit
+                                                    </button>
 
                                                     <!-- Delete Action -->
-                                                    <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                    <form action="{{ route('admin.courses.destroy', encrypt($course->id)) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="w-full flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700">
-                                                            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                <path d="M3 6h18"/>
-                                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                                            </svg>
-                                                            Delete
+                                                            🗑️ Delete
                                                         </button>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                  
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
                     @endif
-                </div>  
+
+                    <!-- List of Users Enrolled in this Course -->
+                    <div id="viewUsersModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white" id="viewUsersModalTitle"></h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    onclick="closeViewUsersModal()">
+                                    ✕
+                                </button>
+                            </div>
+                            <div id="enrolledUsersList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Course Modal -->
+                    <div id="editcourseModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Course</h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    onclick="closeEditModal()">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form id="editCourseForm" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="mb-3">
+                                    <label for="edit_course_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Course Name</label>
+                                    <input type="text" id="edit_course_name" name="course_name" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_course_desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Course Description</label>
+                                    <textarea id="edit_course_desc" name="course_desc" rows="3" required
+                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"></textarea>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Course</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Assign Role Modal -->
+                    <div id="assignRoleModal" class="hs-overlay hidden fixed inset-0 z-[80] w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Assign Role to Course: <span id="modalCourseName"></span>
+                                </h5>
+                                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
+                                    onclick="closeAssignModal()">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form id="assignRoleForm" method="POST">
+                                @csrf
+                                <input type="hidden" id="courseIdInput" name="course_id">
+                                
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-2 dark:text-white">
+                                        Select Roles
+                                    </label>
+                                    <div class="space-y-2">
+                                        @foreach(['Faculty', 'Staff', 'Student', 'Others'] as $role)
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="roles[]" value="{{ $role }}" 
+                                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 role-checkbox"
+                                                    data-role="{{ $role }}">
+                                                <span class="ml-2">{{ $role }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" onclick="closeAssignModal()"
+                                        class="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Save Roles
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Edit Course Modal Functions
+        function openEditModal(id, name, desc) {
+            document.getElementById('edit_course_name').value = name;
+            document.getElementById('edit_course_desc').value = desc;
+            document.getElementById('editCourseForm').action = `/admin/courses/${id}`;
+            document.getElementById('editcourseModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editcourseModal').classList.add('hidden');
+        }
+
+        // Assign Role Modal Functions
+        function openAssignModal(courseId, courseName, assignedRoles) {
+            // Set course name in modal title
+            document.getElementById('modalCourseName').textContent = courseName;
+            
+            // Set course ID in hidden input
+            document.getElementById('courseIdInput').value = courseId;
+            
+            // Reset all checkboxes
+            document.querySelectorAll('.role-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Check the boxes for assigned roles
+            if (Array.isArray(assignedRoles)) {
+                assignedRoles.forEach(role => {
+                    const checkbox = document.querySelector(`.role-checkbox[data-role="${role}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            
+            // Show modal
+            document.getElementById('assignRoleModal').classList.remove('hidden');
+        }
+
+        function closeAssignModal() {
+            document.getElementById('assignRoleModal').classList.add('hidden');
+        }
+
+        // AssignRoleForm event listener 
+        document.getElementById('assignRoleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            const courseId = formData.get('course_id');
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Saving...';
+            
+            fetch(`/admin/courses/${courseId}/assign-roles`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closeAssignModal();
+                    // Show success message
+                    alert('Roles assigned successfully!');
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to save roles');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving roles: ' + (error.message || 'Unknown error'));
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Save Roles';
+            });
+        });
+
+        // EditCourseForm event listener 
+        document.getElementById('editCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Saving...';
+            
+            // Add _method=PUT to the form data
+            formData.append('_method', 'PUT');
+            
+            fetch(form.action, {
+                method: 'POST', // Still POST because we're using _method override
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closeEditModal();
+                    alert('Course updated successfully!');
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to update course');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating course: ' + (error.message || 'Unknown error'));
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Update Course';
+            });
+        });
+
+        // View Users Modal Functions
+        function fetchEnrolledUsers(courseId, courseName) {
+            const usersList = document.getElementById('enrolledUsersList');
+            usersList.innerHTML = '<p class="text-gray-500">Loading users...</p>';
+            
+            console.log(`Fetching users for course ${courseId}`); // Debug log
+            
+            fetch(`/admin/courses/${courseId}/users`)
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug log
+                    if (!response.ok) {
+                        // Get the response text to see the actual error
+                        return response.text().then(text => {
+                            console.error('Error response text:', text);
+                            throw new Error(`Server returned ${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data); // Debug log
+                    if (data.success) {
+                        openViewUsersModal(courseId, courseName, data.users);
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch enrolled users');
+                    }
+                })
+                .catch(error => {
+                    console.error('Full error:', error); // Debug log
+                    usersList.innerHTML = `
+                        <p class="text-red-500">Error: ${error.message}</p>
+                        <button onclick="fetchEnrolledUsers('${courseId}', '${courseName}')" 
+                            class="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Retry
+                        </button>
+                    `;
+                    document.getElementById('viewUsersModal').classList.remove('hidden');
+                });
+        }
+
+        function openViewUsersModal(courseId, courseName, enrolledUsers) {
+            // Set course name in modal title
+            document.getElementById('viewUsersModalTitle').textContent = 
+                `Users Enrolled in ${courseName} Course`;
+            
+            // Clear previous content
+            const usersList = document.getElementById('enrolledUsersList');
+            usersList.innerHTML = '';
+            
+            // Check if there are enrolled users
+            if (enrolledUsers && enrolledUsers.length > 0) {
+                // Create a table to display users
+                const table = document.createElement('div');
+                table.className = 'overflow-y-auto max-h-[400px]';
+                
+                const tableHeader = `
+                    <div class="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-2">
+                        <div class="col-span-2">ID</div>
+                        <div class="col-span-5">Name</div>
+                        <div class="col-span-3">Role</div>
+                    </div>
+                `;
+                table.innerHTML = tableHeader;
+                
+                // Add each user to the table
+                enrolledUsers.forEach(user => {
+                    const userRow = document.createElement('div');
+                    userRow.className = 'grid grid-cols-12 gap-2 text-sm py-2 px-2 border-t hover:bg-gray-50 dark:hover:bg-gray-700';
+                    userRow.innerHTML = `
+                        <div class="col-span-2 flex items-center">${user.user_id}</div>
+                        <div class="col-span-5 flex items-center">${user.user_name}</div>
+                        <div class="col-span-3">
+                            <span class="px-2 py-1 text-xs rounded-full ${getRoleBadgeClass(user.role_name)}">
+                                ${user.role_name}
+                            </span>
+                        </div>
+                        
+                    `;
+                    table.appendChild(userRow);
+                });
+                
+                usersList.appendChild(table);
+            } else {
+                usersList.innerHTML = '<p class="text-gray-500">No users enrolled in this course yet.</p>';
+            }
+            
+            // Show modal
+            document.getElementById('viewUsersModal').classList.remove('hidden');
+        }
+
+        function getRoleBadgeClass(roleName) {
+            switch(roleName) {
+                case 'Faculty': return 'bg-blue-100 text-blue-800';
+                case 'Staff': return 'bg-green-100 text-green-800';
+                case 'Student': return 'bg-yellow-100 text-yellow-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function closeViewUsersModal() {
+            document.getElementById('viewUsersModal').classList.add('hidden');
+        }
+
+    </script>
 </x-app-layout>
