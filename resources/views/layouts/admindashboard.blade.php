@@ -43,7 +43,10 @@
       <!-- Header -->
       <header class="p-4 flex justify-between items-center gap-x-2">
       <div class="flex items-center gap-0">  <!-- Changed from gap-3 to gap-2 -->
-        <img src="{{ asset('assets/img/shield.png') }}" 
+        <img src="{{ asset('assets/img/logo_cmu.png') }}" 
+            alt="CoursePriva Logo" 
+            class="h-14 w-auto">
+        <img src="{{ asset('assets/img/ODP-Logo.png') }}" 
             alt="CoursePriva Logo" 
             class="h-14 w-auto">
         
@@ -138,7 +141,8 @@
 
 
 <!-- ========== FOOTER ========== -->
-<footer class="fixed bottom-0 left-0 right-0 bg-black dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700 p-2 z-50">
+<!-- <footer class="fixed bottom-0 left-0 right-0 bg-black dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700 p-2 z-50"> -->
+<footer class="fixed bottom-0 left-0 right-0 bg-green-800 p-2 z-30">
   <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
     @php
       // Only get published policies
@@ -183,13 +187,13 @@
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
             {{ $terms->title ?? 'Terms and Conditions' }}
           </h3>
-          <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#terms-modal">
+          <!-- <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#terms-modal">
             <span class="sr-only">Close</span>
             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6 6 18"/>
               <path d="m6 6 12 12"/>
             </svg>
-          </button>
+          </button> -->
         </div>
         
         <!-- Modal Body -->
@@ -205,7 +209,7 @@
         
         <!-- Modal Footer -->
         <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2">
-          <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#terms-modal">Close</button>
+          <!-- <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#terms-modal">Close</button> -->
           <button type="button" class="btn btn-sm btn-primary" id="accept-terms" data-hs-overlay="#terms-modal">Accept</button>
         </div>
       </div>
@@ -226,13 +230,13 @@
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
             {{ $privacy->title ?? 'Privacy Policy' }}
           </h3>
-          <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#privacy-modal">
+          <!-- <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#privacy-modal">
             <span class="sr-only">Close</span>
             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6 6 18"/>
               <path d="m6 6 12 12"/>
             </svg>
-          </button>
+          </button> -->
         </div>
         
         <!-- Modal Body -->
@@ -248,7 +252,7 @@
         
         <!-- Modal Footer -->
         <div class="p-4 border-t dark:border-neutral-700 flex justify-end gap-x-2">
-          <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#privacy-modal">Close</button>
+          <!-- <button type="button" class="btn btn-sm btn-outline-secondary" data-hs-overlay="#privacy-modal">Close</button> -->
           <button type="button" class="btn btn-sm btn-primary" id="accept-privacy" data-hs-overlay="#privacy-modal">Accept</button>
         </div>
       </div>
@@ -269,13 +273,13 @@
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
             {{ $cookies->title ?? 'Cookies Policy' }}
           </h3>
-          <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#cookies-modal">
+          <!-- <button type="button" class="size-7 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" data-hs-overlay="#cookies-modal">
             <span class="sr-only">Close</span>
             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6 6 18"/>
               <path d="m6 6 12 12"/>
             </svg>
-          </button>
+          </button> -->
         </div>
         
         <!-- Modal Body -->

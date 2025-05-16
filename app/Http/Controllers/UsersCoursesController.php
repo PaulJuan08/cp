@@ -136,25 +136,34 @@ class UsersCoursesController extends Controller
     {
         try {
             $courseId = Crypt::decrypt($encryptedCourseId);
-            $course = Course::findOrFail($courseId);
             $user = Auth::user();
+            $course = Course::with('topics')->findOrFail($courseId);
             
-            if (!$this->hasCompletedCourse($user, $course)) {
-                return redirect()->route('users.courses.show', $encryptedCourseId)
-                    ->with('error', 'You must complete the course to download the certificate.');
+            // Use your existing calculation method
+            $progress = $this->calculateCourseProgress($user, $course);
+            
+            // Only allow certificate if course is completed
+            if ($progress < 100) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Course not completed. Current progress: {$progress}%"
+                ]);
             }
-
-            $pdf = PDF::loadView('users.courses.certificate', [
-                'user' => $user,
-                'course' => $course,
-                'date' => now()->format('F j, Y')
-            ]);
             
-            return $pdf->stream("certificate-{$course->slug}-{$user->id}.pdf");
+            $certificateData = [
+                'userName' => $user->name,
+                'courseName' => $course->course_name,
+                'completionDate' => now()->format('F j, Y'),
+                'certificateId' => 'CERT-'.strtoupper(uniqid())
+            ];
             
-        } catch (DecryptException $e) {
+            // Generate PDF
+            $pdf = Pdf::loadView('certificates.template', $certificateData);
+            return $pdf->download("certificate-{$course->slug}-{$user->id}.pdf");
+            
+        } catch (\Exception $e) {
             return redirect()->route('users.courses.index')
-                ->with('error', 'Invalid course identifier');
+                ->with('error', 'Error generating certificate: ' . $e->getMessage());
         }
     }
 

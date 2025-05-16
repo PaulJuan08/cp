@@ -266,7 +266,7 @@
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course Name</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th> -->
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white dark:bg-neutral-900 divide-y divide-gray-200 dark:divide-neutral-700">
@@ -305,11 +305,11 @@
                                                         {{ $course->progress == 100 ? 'Completed' : ($course->progress > 0 ? 'In Progress' : 'Not Started') }}
                                                     </span>
                                                 </td>
-                                                <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                                    @if($course['can_print'])
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    @if($course->progress == 100)
                                                         <a href="{{ route('admin.users.certificate.print', [
                                                             'encryptedUser' => Crypt::encrypt($user->id),
-                                                            'encryptedCourse' => Crypt::encrypt($course['course']->id)
+                                                            'encryptedCourse' => Crypt::encrypt($course->id)
                                                         ]) }}" 
                                                         class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -320,7 +320,7 @@
                                                     @else
                                                         <span class="text-gray-500 dark:text-gray-400 text-sm">Complete course to unlock</span>
                                                     @endif
-                                                </td> -->
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -346,14 +346,25 @@
                                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                                             Certificate Status
                                         </h3>
-                                        <button type="button" 
-                                                onclick="checkCertificateStatus({{ $course->id }}, {{ $course->progress }})"
-                                                class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                            </svg>
-                                            Print Certificate
-                                        </button>
+                                        @if(isset($course) && $course)
+                                            <button type="button" 
+                                                    onclick="checkCertificateStatus({{ $course->id }}, {{ $course->progress }})"
+                                                    class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                </svg>
+                                                Print Certificate
+                                            </button>
+                                        @else
+                                            <button type="button" 
+                                                    class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-400 cursor-not-allowed dark:bg-gray-600"
+                                                    disabled>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                </svg>
+                                                No Certificate Available
+                                            </button>
+                                        @endif
                                     </div>
                                     
                                     <!-- Modal Body -->

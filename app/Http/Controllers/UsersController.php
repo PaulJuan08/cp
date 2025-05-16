@@ -198,6 +198,8 @@ class UsersController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
 
+    
+
     public function show($encryptedUserId)
     {
         try {

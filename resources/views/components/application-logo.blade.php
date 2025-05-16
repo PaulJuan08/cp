@@ -5,5 +5,6 @@
 
 <!-- Logo -->
 <div class="flex-shrink-0 flex items-center">
-    <img class="h-32 w-auto" src="{{ asset('assets/img/shield.png') }}" alt="CoursePriva Logo">
+    <img class="h-32 w-auto" src="{{ asset('assets/img/logo_cmu.png') }}" alt="CoursePriva Logo">
+    <img class="h-32 w-auto" src="{{ asset('assets/img/ODP-Logo.png') }}" alt="CoursePriva Logo">
 </div>
