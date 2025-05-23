@@ -10,12 +10,12 @@
                     <p class="text-sm text-gray-500 dark:text-neutral-400 mt-1">Manage legal documents and policies</p>
                 </div>
                 <button type="button" 
-                        class="btn btn-primary flex items-center gap-x-2"
-                        data-hs-overlay="#create-utility-modal">
+                    class="px-4 py-2.5 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                    data-hs-overlay="#create-utility-modal">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                     </svg>
-                    Create New Utility
+                    <span class="font-medium">Create New Utility</span>
                 </button>
             </div>
 
