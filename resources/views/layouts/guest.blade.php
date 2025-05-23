@@ -11,7 +11,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <!-- logo -->
-        <link rel="icon" href="{{ asset('assets/img/shield.png') }}?v=1" type="image/png" sizes="128x128">
+        <link rel="icon" href="{{ asset('assets/img/ODP-Logo.png') }}?v=1" type="image/png" sizes="128x128">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
