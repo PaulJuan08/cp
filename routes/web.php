@@ -17,6 +17,7 @@ use App\Http\Controllers\{
 };
 use App\Http\Controllers\UtilityController; 
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,9 @@ use App\Http\Controllers\CertificateController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Contact Routes
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -151,8 +155,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('topics', TopicsController::class)->parameters([
         'topics' => 'encryptedTopic'
     ]);
-    Route::put('/topics', [TopicsController::class, 'update'])
-        ->name('topics.update'); // Fixed prefix inconsistency
+    // Route::put('/topics', [TopicsController::class, 'update'])
+    //     ->name('topics.update'); // Fixed prefix inconsistency
     
     // Quiz Management (Nested under Topics)
     Route::prefix('topics/{encryptedTopic}/quiz')->name('topics.quiz.')->group(function () {
