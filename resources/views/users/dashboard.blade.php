@@ -31,7 +31,7 @@
                 @if($userCourses->isEmpty())
                     <div class="bg-white p-6 rounded-lg shadow-md text-center dark:bg-gray-800">
                         <p class="text-gray-600 dark:text-gray-300">
-                            No courses assigned to you yet.
+                            No courses enrolled yet.
                         </p>
                         <a href="{{ route('users.courses.index') }}" class="mt-3 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                             Browse Courses

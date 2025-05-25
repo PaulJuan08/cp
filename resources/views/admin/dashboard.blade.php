@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
     barChartCtx.id = 'monthly-bar-chart';
     document.getElementById('bar-chart-container').appendChild(barChartCtx);
     
-    const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May',];
     
     const barChart = new Chart(barChartCtx, {
         type: 'bar',
