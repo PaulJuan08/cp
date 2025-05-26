@@ -318,7 +318,7 @@
                                                             Print Certificate
                                                         </a>
                                                     @else
-                                                        <span class="text-gray-500 dark:text-gray-400 text-sm">Complete course to unlock</span>
+                                                        <span class="text-gray-500 dark:text-gray-400 text-sm">Not yet completed</span>
                                                     @endif
                                                 </td>
                                             </tr>

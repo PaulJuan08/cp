@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Cache;
 
 class CertificateController extends Controller 
 {
-    // For admin printing certificates
     public function print($encryptedUser, $encryptedCourse)
     {
         try {
@@ -21,11 +20,9 @@ class CertificateController extends Controller
             $user = User::findOrFail($userId);
             $course = Course::with('topics')->findOrFail($courseId);
             
-            // Calculate the progress instead of trying to access it from pivot
             $progress = $this->calculateCourseProgress($user, $course);
             
-            // Pass true for adminGenerated since this is called from admin controller
-            return $this->generateCertificate($user, $course, $progress, true);
+            return $this->generateCertificate($user, $course, $progress);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -34,7 +31,6 @@ class CertificateController extends Controller
         }
     }
     
-    // Calculation of course progress
     protected function calculateCourseProgress(User $user, Course $course)
     {
         $totalTopics = $course->topics->count();
@@ -52,26 +48,17 @@ class CertificateController extends Controller
         return min(round(($completedTopics / $totalTopics) * 100), 100);
     }
     
-    // Alternative approach without a dedicated certificates table
     protected function getCertificateCount($year, $month)
     {
         $cacheKey = "certificate_count_{$year}_{$month}";
         
-        if (Cache::has($cacheKey)) {
-            $count = Cache::get($cacheKey) + 1;
-        } else {
-            $count = 1;
-        }
-        
-        Cache::put($cacheKey, $count, now()->addDays(32)); // Store for more than a month
-        
-        return $count;
+        return Cache::remember($cacheKey, now()->addDays(32), function() {
+            return 1;
+        }) + 1;
     }
     
-    // Shared certificate generation logic
-    protected function generateCertificate(User $user, Course $course, $progress, $adminGenerated = false)
+    protected function generateCertificate(User $user, Course $course, $progress)
     {
-        // Check if course is completed
         if ($progress < 100) {
             return response()->json([
                 'success' => false,
@@ -79,29 +66,22 @@ class CertificateController extends Controller
             ], 403);
         }
         
-        // Get the current year and month
         $year = date('Y');
         $month = date('m');
-        
-        // Get certificate number for this month using the helper method
         $certificateCount = $this->getCertificateCount($year, $month);
-        
-        // Format the certificate ID: YYYY-MM-XXXX (where XXXX is padded with zeros)
         $certificateId = $year . '-' . $month . '-' . str_pad($certificateCount, 4, '0', STR_PAD_LEFT);
         
         $certificateData = [
             'userName' => $user->name,
             'courseName' => $course->course_name,
+            'courseDescription' => $course->description,
             'completionDate' => now()->format('F j, Y'),
-            'certificateId' => $certificateId,
-            'adminGenerated' => $adminGenerated
+            'certificateId' => $certificateId
         ];
         
-        // Load PDF view and set orientation to landscape and paper size to A4
         $pdf = Pdf::loadView('certificates.template', $certificateData);
         $pdf->setPaper('a4', 'landscape');
         
-        // Optional: Set additional options if needed
         $pdf->setOptions([
             'dpi' => 150,
             'defaultFont' => 'DejaVu Sans',
@@ -109,6 +89,6 @@ class CertificateController extends Controller
             'isRemoteEnabled' => true
         ]);
         
-        return $pdf->download("certificate-{$user->id}-{$course->slug}.pdf");
+        return $pdf->download("certificate-{$course->slug}-{$user->id}.pdf");
     }
 }

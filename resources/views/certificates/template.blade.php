@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Certificate of Participation</title>
+    <title>Certificate of Completion</title>
     <style>
         @page {
             size: landscape;
@@ -24,35 +24,6 @@
             position: relative;
             padding: 0;
             margin: 0;
-        }
-        .corner-decoration {
-            position: absolute;
-            width: 25%;
-            height: 25%;
-        }
-        .top-left {
-            top: 0;
-            left: 0;
-            border-top: 40px solid #4a8e3b;
-            border-right: 40px solid transparent;
-        }
-        .top-right {
-            top: 0;
-            right: 0;
-            border-top: 40px solid #f2c94c;
-            border-left: 40px solid transparent;
-        }
-        .bottom-left {
-            bottom: 0;
-            left: 0;
-            border-bottom: 40px solid #4a8e3b;
-            border-right: 40px solid transparent;
-        }
-        .bottom-right {
-            bottom: 0;
-            right: 0;
-            border-bottom: 40px solid #f2c94c;
-            border-left: 40px solid transparent;
         }
         .logo-container {
             margin-top: 2cm;
@@ -98,7 +69,7 @@
             width: 80%;
             font-style: italic;
         }
-        .participation-text {
+        .completion-text {
             font-size: 16px;
             color: #555;
             margin: 0.5cm auto;
@@ -161,6 +132,16 @@
             clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%);
             z-index: -1;
         }
+        .watermark {
+            position: absolute;
+            opacity: 0.1;
+            font-size: 120px;
+            color: #4a8e3b;
+            transform: rotate(-45deg);
+            left: 25%;
+            top: 30%;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -168,30 +149,32 @@
         <!-- Decorative elements -->
         <div class="top-wave"></div>
         <div class="bottom-wave"></div>
+        <div class="watermark">COURSEPRIVA</div>
         
         <!-- Logo section -->
         <div class="logo-container">
             <img src="{{ public_path('assets/img/logo_cmu.png') }}" alt="CMU Logo" class="logo">
-            <img src="{{ public_path('assets/img/ODP-Logo.png') }}" alt="Shield Logo" class="logo">
+            <img src="{{ public_path('assets/img/ODP-Logo.png') }}" alt="ODP Logo" class="logo">
         </div>
         
         <!-- Certificate header -->
         <div class="certificate-title">CERTIFICATE</div>
-        <div class="certificate-subtitle">OF PARTICIPATION</div>
+        <div class="certificate-subtitle">OF COMPLETION</div>
         
         <!-- Student information -->
         <div class="student-name">{{ $userName }}</div>
         
-        <!-- Participation details -->
-        <div class="participation-text">
-            for participating in the Awareness on "Data Privacy Act of 2012 and 
-            Responsible Technology Use" on {{ $completionDate }} held at the
-            College of Education Hall, Central Mindanao University
+        <!-- Completion details -->
+        <div class="completion-text">
+            has successfully completed the course <strong>"{{ $courseName }}"</strong>
+            @if(isset($courseDescription))
+            <br>{{ $courseDescription }}
+            @endif
+            <br>on {{ $completionDate }} through the CoursePriva Learning Platform
         </div>
         
         <div class="date-text">
-            Given this {{ date('jS', strtotime($completionDate)) }} day of {{ date('F Y', strtotime($completionDate)) }} at the College of Education Hall,
-            Central Mindanao University
+            Given this {{ date('jS', strtotime($completionDate)) }} day of {{ date('F Y', strtotime($completionDate)) }}
         </div>
         
         <!-- Signature section -->
