@@ -16,7 +16,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            background: #fff;
+            background-color: #fff;
         }
         .certificate-container {
             width: 100%;
@@ -24,32 +24,54 @@
             position: relative;
             padding: 0;
             margin: 0;
+            overflow: hidden;
+        }
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         .logo-container {
-            margin-top: 2cm;
+            margin-top: 1.5cm;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1cm;
+            gap: 1.5cm;
+            padding: 15px;
+            border-radius: 8px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .logo {
-            width: 2.5cm;
-            height: 2.5cm;
+            width: 2.8cm;
+            height: 2.8cm;
+            object-fit: contain;
         }
         .certificate-title {
-            font-size: 48px;
+            font-size: 92px;
             font-weight: bold;
-            color: #325f28;
-            margin-top: 1cm;
+            font-family: "Times New Roman", Times, Georgia, "Palatino Linotype", serif;
+            color: #2a5a23;
+            margin-top: 0.1cm;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
         .certificate-subtitle {
-            font-size: 24px;
-            color: #555;
-            margin-top: 0.5cm;
+            font-size: 46px;
+            font-family: "Times New Roman", Times, Georgia, "Palatino Linotype", serif;
+            color: #2a5a23;
+            margin-top: 0.2cm;
             text-transform: uppercase;
             position: relative;
+            letter-spacing: 2px;
         }
         .certificate-subtitle:before,
         .certificate-subtitle:after {
@@ -57,104 +79,110 @@
             display: inline-block;
             width: 5cm;
             height: 1px;
-            background: #555;
-            margin: 0 0.5cm;
+            background: linear-gradient(90deg, transparent, #555, transparent);
+            margin: 0 0.8cm;
             vertical-align: middle;
         }
         .student-name {
-            font-size: 42px;
-            font-family: 'Script MT Bold', 'Brush Script MT', cursive;
-            color: #325f28;
-            margin: 1.5cm auto 0.5cm;
+            font-size: 74px;
+            font-family: "Brush Script MT", "Lucida Handwriting", "Comic Sans MS", cursive;
+            color: black;
+            margin: 0.8cm auto 0.3cm;
             width: 80%;
             font-style: italic;
         }
         .completion-text {
-            font-size: 16px;
-            color: #555;
-            margin: 0.5cm auto;
+            font-size: 30px;
+            color: #444;
+            margin: 0.4cm auto;
             width: 80%;
-            line-height: 1.5;
+            line-height: 1.4;
+            padding: 10px;
+            border-radius: 5px;
         }
         .date-text {
-            font-size: 16px;
+            font-size: 32px;
             font-style: italic;
             color: #555;
-            margin: 0.5cm auto;
+            margin: 0.3cm auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
         }
         .signature-section {
-            margin: 1.5cm auto 0;
+            margin: 1.2cm auto 0;
             padding: 0 2cm;
         }
         .signature-area {
             text-align: center;
-            width: 7cm;
+            width: 8cm;
             margin: 0 auto;
-        }
-        .signature-line {
-            width: 7cm;
-            border-bottom: 1px solid #333;
-            margin: 0 auto 0.3cm;
+            padding: 10px;
+            border-radius: 5px;
         }
         .signature-name {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 30px;
             margin-bottom: 0.1cm;
+            color: #2a5a23;
         }
         .signature-title {
-            font-size: 14px;
+            font-size: 22px;
             color: #555;
+            letter-spacing: 1px;
         }
         .certificate-number {
             position: absolute;
-            bottom: 0.5cm;
-            left: 0.5cm;
-            font-size: 10px;
-            color: #777;
+            bottom: 0.3cm;
+            left: 1.5cm;
+            font-size: 18px;
+            color: yellow;
+            padding: 5px 10px;
+            border-radius: 3px;
         }
         .top-wave {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 2cm;
+            height: 2.5cm;
             background: linear-gradient(90deg, #4a8e3b 60%, #f2c94c 40%);
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 60%);
-            z-index: -1;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 70%);
+            opacity: 0.7;
         }
         .bottom-wave {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 2cm;
+            height: 2.5cm;
             background: linear-gradient(90deg, #f2c94c 40%, #4a8e3b 60%);
-            clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%);
-            z-index: -1;
-        }
-        .watermark {
-            position: absolute;
-            opacity: 0.1;
-            font-size: 120px;
-            color: #4a8e3b;
-            transform: rotate(-45deg);
-            left: 25%;
-            top: 30%;
-            z-index: -1;
+            clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 100%);
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
+    <!-- Background image -->
+    @php
+        $backgroundImage = base64_encode(file_get_contents(public_path('assets/img/background.png')));
+    @endphp
+    <div class="background-image" style="background-image: url('data:image/png;base64,{{ $backgroundImage }}');"></div>
+    
     <div class="certificate-container">
         <!-- Decorative elements -->
         <div class="top-wave"></div>
         <div class="bottom-wave"></div>
-        <div class="watermark">COURSEPRIVA</div>
         
         <!-- Logo section -->
+        @php
+            $cmuLogo = base64_encode(file_get_contents(public_path('assets/img/logo_cmu.png')));
+            $odpLogo = base64_encode(file_get_contents(public_path('assets/img/ODP-Logo.png')));
+        @endphp
+
         <div class="logo-container">
-            <img src="{{ public_path('assets/img/logo_cmu.png') }}" alt="CMU Logo" class="logo">
-            <img src="{{ public_path('assets/img/ODP-Logo.png') }}" alt="ODP Logo" class="logo">
+            <img src="data:image/png;base64,{{ $cmuLogo }}" alt="CMU Logo" class="logo">
+            <img src="data:image/png;base64,{{ $odpLogo }}" alt="ODP Logo" class="logo">
         </div>
         
         <!-- Certificate header -->
@@ -170,19 +198,19 @@
             @if(isset($courseDescription))
             <br>{{ $courseDescription }}
             @endif
-            <br>on {{ $completionDate }} through the CoursePriva Learning Platform
+            <br> through the CoursePriva Learning Platform
         </div>
         
         <div class="date-text">
             Given this {{ date('jS', strtotime($completionDate)) }} day of {{ date('F Y', strtotime($completionDate)) }}
+            at Central Mindanao University.
         </div>
         
         <!-- Signature section -->
         <div class="signature-section">
             <div class="signature-area">
-                <div class="signature-line"></div>
-                <div class="signature-name">EMELIO C. NAVAJA</div>
-                <div class="signature-title">Data Protection Officer</div>
+                <div class="signature-name">ROLITO G. EBALLE</div>
+                <div class="signature-title">University President</div>
             </div>
         </div>
         
