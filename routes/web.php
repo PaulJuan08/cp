@@ -61,7 +61,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('dashboard');
 
     // Certificate routes
-    Route::get('/users/{encryptedUser}/courses/{encryptedCourse}/certificate', 
+    Route::get('/users/{encryptedUser}/certificate/print/{encryptedCourse}', 
         [CertificateController::class, 'print'])
         ->name('users.certificate.print');
 
@@ -188,6 +188,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // For regular users
 Route::middleware('auth')->group(function () {
     Route::get('/users/dashboard', [UsersController::class, 'dashboard'])->name('users.dashboard');
+
+    // Certificate routes
+    Route::middleware('auth')->group(function () {
+        Route::get('/users/{encryptedUser}/courses/{encryptedCourse}/certificate', 
+            [CertificateController::class, 'print'])
+            ->name('users.certificate.print');
+    });
 
     // Courses Management
     Route::get('/users/courses', [UsersCoursesController::class, 'index'])

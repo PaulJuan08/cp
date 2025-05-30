@@ -1,295 +1,210 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Certificate of Excellence</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Certificate of Participation</title>
     <style>
         @page {
             size: landscape;
             margin: 0;
         }
-        
         body {
-            font-family: 'Georgia', serif;
-            background-color: #f5f5f5;
+            font-family: 'DejaVu Sans', sans-serif;
+            color: #333;
+            text-align: center;
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            /* Force landscape orientation */
-            min-height: 100vh;
-            min-width: 100vw;
+            background: #fff;
         }
-        
         .certificate-container {
             width: 100%;
-            height: 100vh;
-            margin: 0 auto;
+            height: 100%;
             position: relative;
-            overflow: hidden;
-            /* Ensure landscape orientation */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            margin: 0;
         }
-        
-        .certificate {
-            width: 1050px;
-            height: 750px;
-            background: linear-gradient(to right, #ffffff, #f9f9f9);
-            border: none;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
-            position: relative;
-            /* Force landscape aspect ratio */
-            aspect-ratio: 1.4 / 1;
-        }
-        
-        .certificate-border {
+        .corner-decoration {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            border: 2px solid #0C4B33;
-            box-shadow: inset 0 0 0 1px #0C4B33;
+            width: 25%;
+            height: 25%;
         }
-        
-        .certificate-frame {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            right: 30px;
-            bottom: 30px;
-            border: 3px double #0C4B33;
-            padding: 40px;
-            background-image: url("/api/placeholder/1050/750");
-            background-size: cover;
-            background-blend-mode: overlay;
-            background-color: rgba(255, 255, 255, 0.95);
-        }
-        
-        .corner {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #0C4B33;
-        }
-        
         .top-left {
-            top: 10px;
-            left: 10px;
-            border-right: none;
-            border-bottom: none;
+            top: 0;
+            left: 0;
+            border-top: 40px solid #4a8e3b;
+            border-right: 40px solid transparent;
         }
-        
         .top-right {
-            top: 10px;
-            right: 10px;
-            border-left: none;
-            border-bottom: none;
+            top: 0;
+            right: 0;
+            border-top: 40px solid #f2c94c;
+            border-left: 40px solid transparent;
         }
-        
         .bottom-left {
-            bottom: 10px;
-            left: 10px;
-            border-right: none;
-            border-top: none;
+            bottom: 0;
+            left: 0;
+            border-bottom: 40px solid #4a8e3b;
+            border-right: 40px solid transparent;
         }
-        
         .bottom-right {
-            bottom: 10px;
-            right: 10px;
-            border-left: none;
-            border-top: none;
+            bottom: 0;
+            right: 0;
+            border-bottom: 40px solid #f2c94c;
+            border-left: 40px solid transparent;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
+        .logo-container {
+            margin-top: 2cm;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1cm;
         }
-        
-        .title {
+        .logo {
+            width: 2.5cm;
+            height: 2.5cm;
+        }
+        .certificate-title {
             font-size: 48px;
-            color: #0C4B33;
-            font-family: 'Georgia', serif;
-            letter-spacing: 3px;
+            font-weight: bold;
+            color: #325f28;
+            margin-top: 1cm;
             text-transform: uppercase;
-            margin-bottom: 5px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            letter-spacing: 2px;
         }
-        
-        .subtitle {
+        .certificate-subtitle {
             font-size: 24px;
             color: #555;
-            font-style: italic;
-            margin: 15px 0 40px;
+            margin-top: 0.5cm;
+            text-transform: uppercase;
+            position: relative;
         }
-        
-        .name {
-            font-size: 42px;
-            font-weight: bold;
-            color: #333;
-            margin: 40px 0;
-            font-family: 'Times New Roman', Times, serif;
-            border-bottom: 2px solid #0C4B33;
+        .certificate-subtitle:before,
+        .certificate-subtitle:after {
+            content: '';
             display: inline-block;
-            padding: 0 40px 10px;
+            width: 5cm;
+            height: 1px;
+            background: #555;
+            margin: 0 0.5cm;
+            vertical-align: middle;
         }
-        
-        .course {
-            font-size: 28px;
-            margin: 20px 0;
-            color: #444;
+        .student-name {
+            font-size: 42px;
+            font-family: 'Script MT Bold', 'Brush Script MT', cursive;
+            color: #325f28;
+            margin: 1.5cm auto 0.5cm;
+            width: 80%;
+            font-style: italic;
         }
-        
-        .course-name {
-            font-size: 32px;
-            font-weight: bold;
-            color: #0C4B33;
-            margin: 15px 0 40px;
+        .participation-text {
+            font-size: 16px;
+            color: #555;
+            margin: 0.5cm auto;
+            width: 80%;
+            line-height: 1.5;
         }
-        
-        .date {
-            font-size: 20px;
-            margin-top: 80px;
+        .date-text {
+            font-size: 16px;
             font-style: italic;
             color: #555;
+            margin: 0.5cm auto;
         }
-        
-        .signature {
-            width: 200px;
-            margin: 60px auto 0;
+        .signature-section {
+            margin: 1.5cm auto 0;
+            padding: 0 2cm;
+        }
+        .signature-area {
             text-align: center;
+            width: 7cm;
+            margin: 0 auto;
         }
-        
         .signature-line {
-            border-top: 1px solid #333;
-            margin-bottom: 10px;
+            width: 7cm;
+            border-bottom: 1px solid #333;
+            margin: 0 auto 0.3cm;
         }
-        
+        .signature-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 0.1cm;
+        }
         .signature-title {
-            font-size: 16px;
+            font-size: 14px;
             color: #555;
         }
-        
-        .stamp {
+        .certificate-number {
             position: absolute;
-            bottom: 80px;
-            right: 80px;
-            width: 130px;
-            height: 130px;
-            background: linear-gradient(45deg, #0C4B33, #198754);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: rotate(-15deg);
-            opacity: 0.7;
-            border: 2px dashed #fff;
+            bottom: 0.5cm;
+            left: 0.5cm;
+            font-size: 10px;
+            color: #777;
         }
-        
-        .stamp-text {
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            text-align: center;
-        }
-        
-        .ribbon {
+        .top-wave {
             position: absolute;
             top: 0;
-            right: 50px;
-            width: 40px;
-            height: 120px;
-            background-color: #0C4B33;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .ribbon:before {
-            content: '';
-            position: absolute;
-            bottom: -20px;
             left: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 20px 20px 20px;
-            border-color: transparent #0C4B33 transparent #0C4B33;
+            width: 100%;
+            height: 2cm;
+            background: linear-gradient(90deg, #4a8e3b 60%, #f2c94c 40%);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 60%);
+            z-index: -1;
         }
-        
-        .ornament {
+        .bottom-wave {
             position: absolute;
-            width: 200px;
-            height: 60px;
-            border: 3px solid #0C4B33;
-            border-radius: 30px;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0.1;
-        }
-
-        /* Clean up print settings */
-        @media print {
-            @page {
-                size: landscape;
-                margin: 0;
-            }
-            
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
-            }
-            
-            .certificate-container {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .certificate {
-                width: 100%;
-                height: 100%;
-                box-shadow: none;
-            }
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2cm;
+            background: linear-gradient(90deg, #f2c94c 40%, #4a8e3b 60%);
+            clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%);
+            z-index: -1;
         }
     </style>
 </head>
 <body>
     <div class="certificate-container">
-        <div class="certificate">
-            <div class="certificate-border"></div>
-            <div class="certificate-frame">
-                <div class="corner top-left"></div>
-                <div class="corner top-right"></div>
-                <div class="corner bottom-left"></div>
-                <div class="corner bottom-right"></div>
-                
-                <div class="ornament"></div>
-                <div class="ribbon"></div>
-                
-                <div class="header">
-                    <div class="title">Certificate of Excellence</div>
-                    <div class="subtitle">Is Proudly Presented To</div>
-                </div>
-                
-                <div style="text-align: center;">
-                    <div class="name">{{ $user->name }}</div>
-                    
-                    <div class="course">For successfully completing with distinction</div>
-                    <div class="course-name">{{ $course->course_name }}</div>
-                    
-                    <div class="date">Awarded on {{ $date }}</div>
-                </div>
-                
-                <div class="stamp">
-                    <div class="stamp-text">OFFICIALLY CERTIFIED</div>
-                </div>
+        <!-- Decorative elements -->
+        <div class="top-wave"></div>
+        <div class="bottom-wave"></div>
+        
+        <!-- Logo section -->
+        <div class="logo-container">
+            <img src="{{ public_path('assets/img/logo_cmu.png') }}" alt="CMU Logo" class="logo">
+            <img src="{{ public_path('assets/img/ODP-Logo.png') }}" alt="Shield Logo" class="logo">
+        </div>
+        
+        <!-- Certificate header -->
+        <div class="certificate-title">CERTIFICATE</div>
+        <div class="certificate-subtitle">OF PARTICIPATION</div>
+        
+        <!-- Student information -->
+        <div class="student-name">{{ $userName }}</div>
+        
+        <!-- Participation details -->
+        <div class="participation-text">
+            for participating in the Awareness on "Data Privacy Act of 2012 and 
+            Responsible Technology Use" on {{ $completionDate }} held at the
+            College of Education Hall, Central Mindanao University
+        </div>
+        
+        <div class="date-text">
+            Given this {{ date('jS', strtotime($completionDate)) }} day of {{ date('F Y', strtotime($completionDate)) }} at the College of Education Hall,
+            Central Mindanao University
+        </div>
+        
+        <!-- Signature section -->
+        <div class="signature-section">
+            <div class="signature-area">
+                <div class="signature-line"></div>
+                <div class="signature-name">EMELIO C. NAVAJA</div>
+                <div class="signature-title">Data Protection Officer</div>
             </div>
         </div>
+        
+        <!-- Certificate ID -->
+        <div class="certificate-number">{{ $certificateId }}</div>
     </div>
 </body>
 </html>

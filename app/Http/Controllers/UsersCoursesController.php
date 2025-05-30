@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\CourseRole;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Http\Controllers\CertificateController;
 
 class UsersCoursesController extends Controller
 {
@@ -135,31 +136,16 @@ class UsersCoursesController extends Controller
     public function certificate($encryptedCourseId)
     {
         try {
-            $courseId = Crypt::decrypt($encryptedCourseId);
             $user = Auth::user();
+            $courseId = Crypt::decrypt($encryptedCourseId);
             $course = Course::with('topics')->findOrFail($courseId);
             
-            // Use your existing calculation method
-            $progress = $this->calculateCourseProgress($user, $course);
-            
-            // Only allow certificate if course is completed
-            if ($progress < 100) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Course not completed. Current progress: {$progress}%"
-                ]);
-            }
-            
-            $certificateData = [
-                'userName' => $user->name,
-                'courseName' => $course->course_name,
-                'completionDate' => now()->format('F j, Y'),
-                'certificateId' => 'CERT-'.strtoupper(uniqid())
-            ];
-            
-            // Generate PDF
-            $pdf = Pdf::loadView('certificates.template', $certificateData);
-            return $pdf->download("certificate-{$course->slug}-{$user->id}.pdf");
+            // Use the same certificate generation as admin
+            $certificateController = new CertificateController();
+            return $certificateController->print(
+                Crypt::encrypt($user->id),
+                Crypt::encrypt($course->id)
+            );
             
         } catch (\Exception $e) {
             return redirect()->route('users.courses.index')
