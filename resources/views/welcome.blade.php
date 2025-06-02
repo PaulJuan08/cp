@@ -82,7 +82,7 @@
                 <!-- Right Content - Illustration -->
                 <div class="relative">
                     <div class="relative rounded-2xl overflow-hidden shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2850&q=80" alt="Learning illustration" class="w-full h-auto">
+                        <img src="/assets/img/cmu.jpg" alt="CMU" class="w-full h-auto">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                     </div>
                 </div>
