@@ -12,9 +12,11 @@
 
         <h2 class="text-2xl font-bold mb-4">Quizzes for Topic: {{ $topic->topic_name }}</h2>
 
-        <!-- Button to create a new quiz - Fixed route parameter -->
-        <a href="{{ route('admin.topics.quiz.create', ['encryptedTopic' => encrypt($topic->id)]) }}" 
-           class="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">Create New Quiz</a>
+        <!-- Button to create a new quiz - Only show if no quizzes exist -->
+        @if ($quizzes->count() === 0)
+            <a href="{{ route('admin.topics.quiz.create', ['encryptedTopic' => encrypt($topic->id)]) }}" 
+               class="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">Create New Quiz</a>
+        @endif
 
         @if ($quizzes->count() > 0)
             <div class="overflow-x-auto bg-white p-4 rounded-lg shadow-lg">
@@ -30,13 +32,13 @@
                         <tr>
                             <td class="border border-gray-300 px-4 py-2">{{ $quiz->title }}</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <!-- View button - Fixed route parameters -->
+                                <!-- View button -->
                                 <a href="{{ route('admin.topics.quiz.show', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
                                    class="bg-green-500 text-white px-3 py-1 rounded">View</a>
-                                <!-- Edit button - Fixed route parameters -->
-                                <a href="{{ route('admin.topics.quiz.edit', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
-                                   class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
-                                <!-- Delete form - Fixed route parameters -->
+                                <!-- Edit button -->
+                                <!-- <a href="{{ route('admin.topics.quiz.edit', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
+                                   class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a> -->
+                                <!-- Delete form -->
                                 <form action="{{ route('admin.topics.quiz.destroy', ['encryptedTopic' => encrypt($topic->id), 'encryptedQuiz' => encrypt($quiz->id)]) }}" 
                                       method="POST" class="inline">
                                     @csrf
